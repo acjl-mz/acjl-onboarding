@@ -6,7 +6,7 @@
 @media(max-width:820px){.section-heading,.benefit-panel{grid-template-columns:1fr;gap:25px}.roadmap-grid{grid-template-columns:1fr}.landing-actions{align-items:flex-start;flex-direction:column}.roadmap-flow{flex-wrap:wrap}.acjl-footer-inner{flex-wrap:wrap}.acjl-footer-note{margin-left:0;width:100%}}
 
 .landing-description{margin-top:24px}
-.benefit-panel h2{color:var(--acjl-gold)}
+.benefit-panel .acjl-eyebrow{color:var(--acjl-gold)}
 .acjl-footer-inner{flex-direction:column;justify-content:center;text-align:center;gap:8px}
 .acjl-footer-text{color:#dbe2e8;font-size:13px}
 .acjl-footer-note{margin-left:0;color:#91a0ad;font-size:11px}
