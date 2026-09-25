@@ -1,1 +1,1 @@
-import { redirect } from "next/navigation"; export default function Inicio(){redirect("/diagnostico/empresa");}
+import { redirect } from "next/navigation"; export default function Inicio(){redirect("/diagnostico/responsavel");}
