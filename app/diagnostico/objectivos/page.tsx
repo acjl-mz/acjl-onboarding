@@ -1,17 +1,1 @@
-import Link from "next/link";
-
-export default function ObjectivosPage() {
-  return (
-    <main className="min-h-screen bg-[var(--acjl-surface)] p-6">
-      <div className="mx-auto max-w-2xl pt-8">
-        <p className="text-sm text-slate-500">4 de 5 · Objectivos</p>
-        <section className="mt-3 rounded-2xl bg-white p-8 border border-black/5 shadow-sm">
-          <h1 className="text-2xl font-semibold">O que pretende alcançar?</h1>
-          <textarea placeholder="Conte-nos, com as suas palavras, o principal resultado que procura." rows={7} className="mt-6 w-full rounded-lg border border-slate-300 p-3" />
-          <label className="mt-5 flex gap-3 text-sm"><input type="checkbox" /> Gostaria de receber recomendação da ACJL sobre o modelo de contratação.</label>
-          <div className="mt-8 flex justify-between"><Link href="/diagnostico/situacao" className="rounded-lg border px-5 py-3">Voltar</Link><Link href="/diagnostico/revisao" className="rounded-lg bg-slate-900 px-5 py-3 text-white">Continuar</Link></div>
-        </section>
-      </div>
-    </main>
-  );
-}
+import Link from "next/link";import{SiteHeader,SiteFooter}from"@/components/SiteChrome";export default function ObjectivosPage(){return <main className="acjl-page"><SiteHeader step="4 DE 5 · OBJECTIVOS"/><div className="acjl-wrap diagnostic-shell"><div className="acjl-form"><div className="acjl-progress"><span style={{width:"80%"}}/></div><section className="acjl-card diagnostic-card"><div className="acjl-eyebrow">ETAPA 4 · OBJECTIVOS</div><h1>O que pretende alcançar?</h1><p>Conte-nos, com as suas palavras, o principal resultado que procura.</p><textarea placeholder="Ex.: organizar a gestão fiscal, colocar a contabilidade em dia, estruturar o processamento de salários..." rows={7} className="acjl-textarea"/><label className="check-line"><input type="checkbox"/> Gostaria de receber recomendação da ACJL sobre o modelo de contratação.</label><div className="acjl-actions"><Link href="/diagnostico/situacao" className="acjl-button acjl-secondary">← Voltar</Link><Link href="/diagnostico/revisao" className="acjl-button acjl-primary">Continuar →</Link></div></section></div></div><SiteFooter/></main>}
