@@ -7,7 +7,7 @@ export function SiteHeader({ step }: { step?: string }) {
       <Link href="/" aria-label="ACJL - página inicial">
         <Brand compact />
       </Link>
-      {step && <div className="acjl-label">{step}</div>}
+      <Link href="/interno" className="internal-access" aria-label="Acesso interno ACJL" title="Acesso interno ACJL"><span className="internal-access-icon" aria-hidden="true">🔒</span></Link>{step && <div className="acjl-label">{step}</div>}
     </header>
   );
 }
