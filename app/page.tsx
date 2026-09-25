@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { Brand } from "@/components/Brand";
+import { SiteFooter } from "@/components/SiteChrome";
 
-export default function HomePage(){
- return <main className="acjl-page">
-  <header className="acjl-top"><Brand/><div className="acjl-label">SISTEMA DE DIAGNÓSTICO</div></header>
-  <div className="acjl-wrap">
-   <div className="acjl-hero">
-    <section><div className="acjl-eyebrow">ACJL · DIAGNÓSTICO EMPRESARIAL</div><h1 className="acjl-title">Conheça a realidade da sua empresa.</h1><p className="acjl-copy">Antes de apresentar uma solução, a ACJL procura compreender como a sua empresa funciona, o que precisa e qual o nível de apoio necessário.</p><Link className="acjl-button acjl-primary" href="/diagnostico">Começar diagnóstico <span>→</span></Link></section>
-    <aside className="acjl-card acjl-card-dark"><div className="acjl-number">01</div><h2 style={{marginBottom:8}}>Uma análise simples.</h2><p style={{color:"#d5dde4",lineHeight:1.65}}>Sem necessidade de enviar documentos nesta primeira etapa. Responda apenas às perguntas sobre a realidade da sua empresa.</p><div className="acjl-eyebrow" style={{color:"#b9923d",marginTop:28}}>TEMPO ESTIMADO</div><strong>5–10 minutos</strong></aside>
-   </div>
-  </div>
- </main>
-}
+const models=[
+ {n:"01",title:"Avença mensal",text:"Para necessidades contínuas, com acompanhamento regular e uma solução ajustada à realidade da empresa.",items:["Gestão Fiscal e de Impostos","Contabilidade","Processamento de Salários","Assistência Administrativa"]},
+ {n:"02",title:"Requisições de serviços",text:"Para necessidades pontuais, sem compromisso mensal. Solicite o serviço quando precisar.",items:["Serviços fiscais e contabilísticos","Auditorias","Treinamentos","Serviços especializados"]},
+ {n:"03",title:"Solução dimensionada",text:"O diagnóstico ajuda a ACJL a compreender o esforço necessário antes de definir a solução comercial.",items:["Necessidades da empresa","Volume e complexidade","Modelo de contratação","Proposta adequada"]}
+];
+export default function HomePage(){return <main className="acjl-page">
+ <header className="acjl-top"><Link href="/" aria-label="ACJL - página inicial"><Brand compact/></Link></header>
+ <section className="acjl-wrap acjl-landing-hero"><div className="landing-copy"><div className="acjl-eyebrow">DIAGNÓSTICO EMPRESARIAL</div><h1 className="acjl-title">Conheça a realidade da sua empresa.</h1><p className="acjl-copy">Conte-nos como a sua empresa funciona, o que precisa e onde procura apoio. Com esta informação, a ACJL poderá preparar uma solução mais adequada à sua realidade.</p><div className="landing-actions"><Link className="acjl-button acjl-primary" href="/diagnostico/empresa">Começar diagnóstico <span>→</span></Link><span className="landing-time">5–10 minutos · sem documentos nesta etapa</span></div></div></section>
+ <section className="acjl-wrap roadmap-section"><div className="section-heading"><div><div className="acjl-eyebrow">COMO PODEMOS TRABALHAR CONSIGO</div><h2>Uma solução que acompanha a sua necessidade.</h2></div><p>O diagnóstico não é uma contratação. É o ponto de partida para perceber qual modelo faz sentido para a sua empresa.</p></div><div className="roadmap-grid">{models.map(m=><article className="roadmap-card" key={m.n}><div className="roadmap-number">{m.n}</div><h3>{m.title}</h3><p>{m.text}</p><ul>{m.items.map(i=><li key={i}>{i}</li>)}</ul></article>)}</div><div className="roadmap-flow"><span>Conhecer</span><b>→</b><span>Dimensionar</span><b>→</b><span>Propor</span><b>→</b><span>Atender</span></div></section>
+ <section className="acjl-wrap benefit-section"><div className="benefit-panel"><div><div className="acjl-eyebrow">O QUE GANHA COM O DIAGNÓSTICO</div><h2>Menos suposições. Mais clareza sobre a solução.</h2></div><div className="benefit-list"><div><strong>Compreensão da realidade</strong><p>A ACJL conhece o contexto antes de dimensionar o atendimento.</p></div><div><strong>Serviço ajustado</strong><p>As necessidades identificadas orientam os serviços a considerar.</p></div><div><strong>Flexibilidade</strong><p>A solução pode ser contínua, pontual ou especializada.</p></div></div></div></section>
+ <SiteFooter/>
+ </main>}
