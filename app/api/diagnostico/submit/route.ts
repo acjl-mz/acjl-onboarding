@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { responsible, company, model, services, tasks, taskDetails, operations, situation, objectives } = body ?? {};
+    const { responsible, company, model, services, tasks, taskDetails, serviceDetails, operations, situation, objectives } = body ?? {};
 
     if (!responsible || !company || !model || !["AVENCA", "PONTUAL"].includes(model)) {
       return NextResponse.json({ error: "Dados obrigatórios em falta." }, { status: 400 });
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         services: Array.isArray(services) ? services : [],
         tasks: tasks && typeof tasks === "object" ? tasks : {},
         task_details: String(taskDetails || ""),
+        service_details: serviceDetails && typeof serviceDetails === "object" ? serviceDetails : {},
         operations: operations && typeof operations === "object" ? operations : {},
         situation: situation && typeof situation === "object" ? situation : {},
         objectives: objectives && typeof objectives === "object" ? objectives : {}
