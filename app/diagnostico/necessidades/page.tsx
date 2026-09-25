@@ -1,29 +1,6 @@
 "use client";
-
-import { useState } from "react";
 import Link from "next/link";
-
-const services = [
-  "Gestão Fiscal e de Impostos","Contabilidade","Processamento de Salários",
-  "Assistência Administrativa","Auditoria","Treinamento","Serviço especializado","Outro"
-];
-
-export default function NecessidadesPage() {
-  const [selected,setSelected] = useState<string[]>([]);
-  const toggle=(s:string)=>setSelected(selected.includes(s)?selected.filter(x=>x!==s):[...selected,s]);
-  return (
-    <main className="min-h-screen bg-[var(--acjl-surface)] p-6">
-      <div className="mx-auto max-w-2xl pt-8">
-        <p className="text-sm text-slate-500">2 de 5 · Necessidades</p>
-        <section className="mt-3 rounded-2xl bg-white p-8 border border-black/5 shadow-sm">
-          <h1 className="text-2xl font-semibold">Em que podemos apoiar?</h1>
-          <p className="mt-2 text-slate-600">Seleccione todos os serviços que fazem sentido para a sua empresa.</p>
-          <div className="mt-7 grid gap-3">
-            {services.map(s=><button type="button" key={s} onClick={()=>toggle(s)} className={`rounded-xl border p-4 text-left transition ${selected.includes(s)?"border-slate-900 bg-slate-50":"border-slate-200"}`}>{s}<span className="float-right">{selected.includes(s)?"✓":"+"}</span></button>)}
-          </div>
-          <div className="mt-8 flex justify-between"><Link href="/diagnostico/empresa" className="rounded-lg border px-5 py-3">Voltar</Link><Link href="/diagnostico/situacao" className="rounded-lg bg-slate-900 px-5 py-3 text-white">Continuar</Link></div>
-        </section>
-      </div>
-    </main>
-  );
-}
+import { useState } from "react";
+import { Brand } from "@/components/Brand";
+const services=["Gestão Fiscal e de Impostos","Contabilidade","Processamento de Salários","Assistência Administrativa","Auditoria","Treinamento","Serviço especializado","Outro"];
+export default function NecessidadesPage(){const[selected,setSelected]=useState<string[]>([]);const toggle=(s:string)=>setSelected(selected.includes(s)?selected.filter(x=>x!==s):[...selected,s]);return <main className="acjl-page"><header className="acjl-top"><Brand compact/><div className="acjl-label">2 DE 5 · NECESSIDADES</div></header><div className="acjl-wrap"><div className="acjl-form"><div className="acjl-progress"><span style={{width:"40%"}}/></div><div className="acjl-card" style={{marginTop:22}}><div className="acjl-eyebrow">NECESSIDADES</div><h1>Em que podemos apoiar?</h1><p>Seleccione os serviços que fazem sentido para a realidade actual da sua empresa.</p><div className="service-grid">{services.map(s=><button type="button" key={s} onClick={()=>toggle(s)} className={"service-option"+(selected.includes(s)?" active":"")}><span className="service-title">{s}</span><span className="service-check">{selected.includes(s)?"✓":"+"}</span></button>)}</div><div className="acjl-actions"><Link className="acjl-button acjl-secondary" href="/diagnostico/empresa">Voltar</Link><Link className="acjl-button acjl-primary" href="/diagnostico/situacao">Continuar →</Link></div></div></div></div></main>}
