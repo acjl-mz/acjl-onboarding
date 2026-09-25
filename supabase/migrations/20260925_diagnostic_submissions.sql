@@ -9,6 +9,7 @@ create table if not exists public.diagnostic_submissions (
   services jsonb not null default '[]'::jsonb,
   tasks jsonb not null default '{}'::jsonb,
   task_details text not null default '',
+  service_details jsonb not null default '{}'::jsonb,
   operations jsonb not null default '{}'::jsonb,
   situation jsonb not null default '{}'::jsonb,
   objectives jsonb not null default '{}'::jsonb,
