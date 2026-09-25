@@ -1,17 +1,1 @@
-import Link from "next/link";
-
-export default function RevisaoPage() {
-  return (
-    <main className="min-h-screen bg-[var(--acjl-surface)] p-6">
-      <div className="mx-auto max-w-2xl pt-8">
-        <p className="text-sm text-slate-500">5 de 5 · Confirmação</p>
-        <section className="mt-3 rounded-2xl bg-white p-8 border border-black/5 shadow-sm">
-          <h1 className="text-2xl font-semibold">Confirme as informações</h1>
-          <p className="mt-3 text-slate-600">Reveja os dados antes de enviar. Depois da submissão, a equipa ACJL fará a análise.</p>
-          <label className="mt-7 flex gap-3 text-sm"><input type="checkbox" /> Confirmo que as informações fornecidas são verdadeiras de acordo com o meu conhecimento.</label>
-          <div className="mt-8 flex justify-between"><Link href="/diagnostico/objectivos" className="rounded-lg border px-5 py-3">Voltar</Link><Link href="/diagnostico/sucesso" className="rounded-lg bg-slate-900 px-5 py-3 text-white">Enviar diagnóstico</Link></div>
-        </section>
-      </div>
-    </main>
-  );
-}
+import Link from "next/link";import{SiteHeader,SiteFooter}from"@/components/SiteChrome";export default function RevisaoPage(){return <main className="acjl-page"><SiteHeader step="5 DE 5 · CONFIRMAÇÃO"/><div className="acjl-wrap diagnostic-shell"><div className="acjl-form"><div className="acjl-progress"><span style={{width:"100%"}}/></div><section className="acjl-card diagnostic-card"><div className="acjl-eyebrow">ETAPA 5 · CONFIRMAÇÃO</div><h1>Confirme as informações.</h1><p>Reveja os dados antes de enviar. Depois da submissão, a equipa ACJL fará a análise.</p><div className="review-placeholder"><strong>Dados da empresa</strong><span>Serão apresentados aqui os dados preenchidos.</span><strong>Necessidades seleccionadas</strong><span>Serão apresentadas aqui as áreas de apoio seleccionadas.</span><strong>Situação e objectivos</strong><span>Serão apresentados aqui os dados finais.</span></div><label className="check-line"><input type="checkbox"/> Confirmo que as informações fornecidas são verdadeiras de acordo com o meu conhecimento.</label><div className="acjl-actions"><Link href="/diagnostico/objectivos" className="acjl-button acjl-secondary">← Voltar</Link><Link href="/diagnostico/sucesso" className="acjl-button acjl-primary">Enviar diagnóstico</Link></div></section></div></div><SiteFooter/></main>}
