@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+:root {
+  --acjl-ink: #17202a;
+  --acjl-muted: #667085;
+  --acjl-surface: #f7f8fa;
+}
+
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: white;
+  color: var(--acjl-ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
