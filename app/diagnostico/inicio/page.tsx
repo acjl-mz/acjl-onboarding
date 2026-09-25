@@ -1,5 +1,2 @@
 import Link from "next/link";
-
-export default function Inicio() {
-  return <main className="min-h-screen p-6"><div className="mx-auto max-w-2xl pt-16"><div className="rounded-2xl bg-white p-8"><p className="text-sm font-semibold text-slate-500">ETAPA 1 DE 5</p><h1 className="mt-3 text-3xl font-semibold">Empresa</h1><p className="mt-4 text-slate-600">Vamos começar pelos dados essenciais da empresa.</p><Link href="/diagnostico/empresa" className="mt-8 inline-block rounded-lg bg-slate-900 px-5 py-3 text-white">Continuar</Link></div></div></main>;
-}
+export default function Inicio(){return <main className="acjl-page"><header className="acjl-top"><div className="acjl-logo">ACJL</div><div className="acjl-label">1 DE 5 · EMPRESA</div></header><div className="acjl-wrap"><div className="acjl-form"><div className="acjl-progress"><span style={{width:"20%"}}/></div><div className="acjl-card" style={{marginTop:22}}><div className="acjl-eyebrow">ETAPA 1</div><h1>Comecemos pela sua empresa.</h1><p>Precisamos apenas dos dados essenciais para compreender o contexto em que a ACJL poderá apoiar.</p><div className="acjl-actions"><Link className="acjl-button acjl-secondary" href="/diagnostico">Voltar</Link><Link className="acjl-button acjl-primary" href="/diagnostico/empresa">Continuar →</Link></div></div></div></div></main>}
