@@ -1,7 +1,27 @@
 export type DiagnosticData={responsible:{fullName:string;role:string;phone:string;email:string;preferredChannel:string};company:{legalName:string;tradeName:string;nuit:string;organizationType:string;sector:string;mainActivity:string;activityDescription:string;incorporationYear:string;activityStartYear:string;location:string;establishments:string;employeeRange:string;activityVolume:string};model:"AVENCA"|"PONTUAL"|"";services:string[];tasks:Record<string,string[]>;taskDetails:string;operations:{routines:string;processes:string;collection:string;treatment:string;management:string};situation:{provider:string;providerScope:string;motivation:string;pending:string};objectives:{main:string;recommendation:boolean}};
 export const initialDiagnostic:DiagnosticData={responsible:{fullName:"",role:"",phone:"",email:"",preferredChannel:""},company:{legalName:"",tradeName:"",nuit:"",organizationType:"",sector:"",mainActivity:"",activityDescription:"",incorporationYear:"",activityStartYear:"",location:"",establishments:"",employeeRange:"",activityVolume:""},model:"",services:[],tasks:{},taskDetails:"",operations:{routines:"",processes:"",collection:"",treatment:"",management:""},situation:{provider:"",providerScope:"",motivation:"",pending:""},objectives:{main:"",recommendation:false}};
-export function readDiagnostic():DiagnosticData{if(typeof window==="undefined")return initialDiagnostic;try{return JSON.parse(localStorage.getItem("acjl-diagnostic")||"null")||initialDiagnostic}catch{return initialDiagnostic}}
-export function saveDiagnostic(data:DiagnosticData){localStorage.setItem("acjl-diagnostic",JSON.stringify(data))}
+export function readDiagnostic():DiagnosticData{
+  if(typeof window==="undefined") return initialDiagnostic;
+  try{
+    const raw=JSON.parse(localStorage.getItem("acjl-diagnostic")||"null");
+    if(!raw||typeof raw!=="object") return initialDiagnostic;
+    return {
+      ...initialDiagnostic,
+      ...raw,
+      responsible:{...initialDiagnostic.responsible,...(raw.responsible||{})},
+      company:{...initialDiagnostic.company,...(raw.company||{})},
+      services:Array.isArray(raw.services)?raw.services:[],
+      tasks:raw.tasks&&typeof raw.tasks==="object"?raw.tasks:{},
+      operations:{...initialDiagnostic.operations,...(raw.operations||{})},
+      situation:{...initialDiagnostic.situation,...(raw.situation||{})},
+      objectives:{...initialDiagnostic.objectives,...(raw.objectives||{})}
+    };
+  }catch{return initialDiagnostic}
+}
+export function saveDiagnostic(data:DiagnosticData){
+  localStorage.setItem("acjl-diagnostic",JSON.stringify(data))
+}
+
 export const serviceTasks:Record<string,string[]>={
 "Gestão Fiscal e de Impostos":["Apuramento de impostos","Preenchimento e submissão de declarações/guias","Regularização de pendências fiscais","Análise da situação fiscal","Revisão da situação tributária","Apoio em inspecção, notificação ou procedimento da AT","Pedido de reembolso de IVA","Regularização de obrigações fiscais em atraso"],
 "Contabilidade":["Organização de documentos e registos","Lançamentos contabilísticos","Reconciliações bancárias","Fecho de contas","Preparação de demonstrações financeiras","Regularização contabilística","Preparação de processo de contas","Relatórios financeiros / de gestão","Recuperação de contabilidade em atraso"],
