@@ -1,2 +1,13 @@
 import { NextResponse } from "next/server";
-export async function POST(){const r=NextResponse.json({ok:true});r.cookies.set("acjl-internal-access","",{httpOnly:true,expires:new Date(0),path:"/"});return r;}
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+export const runtime = "nodejs";
+
+export async function POST() {
+  try {
+    const supabase = await createSupabaseServerClient();
+    await supabase.auth.signOut();
+  } finally {
+    return NextResponse.json({ ok: true });
+  }
+}
