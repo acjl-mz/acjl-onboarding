@@ -1,36 +1,42 @@
 import { NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
     const { identifier, password } = await request.json().catch(() => ({}));
+    const email = String(identifier || "").trim().toLowerCase();
 
-    const expectedPassword = process.env.INTERNAL_ACCESS_PASSWORD;
-    const expectedEmail = "acjl.corporate@gmail.com";
-    const expectedPhone = process.env.INTERNAL_ACCESS_PHONE?.trim();
-    const token = process.env.INTERNAL_ACCESS_TOKEN;
-
-    const normalizedIdentifier = String(identifier || "").trim().toLowerCase();
-    const validEmail = Boolean(expectedEmail && normalizedIdentifier === expectedEmail);
-    const validPhone = Boolean(expectedPhone && String(identifier || "").trim() === expectedPhone);
-    const validIdentifier = validEmail || validPhone;
-
-    if (!expectedPassword || !token || !validIdentifier || password !== expectedPassword) {
+    if (!email || !password) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
     }
 
-    const response = NextResponse.json({ ok: true });
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    response.cookies.set("acjl-internal-access", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 8,
+    if (error || !data.user?.id || !data.user.email) {
+      return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
+    }
+
+    const admin = createSupabaseAdminClient();
+    const { data: access, error: accessError } = await admin
+      .from("internal_users")
+      .select("user_id, email, role, active")
+      .eq("user_id", data.user.id)
+      .eq("active", true)
+      .maybeSingle();
+
+    if (accessError || !access) {
+      await supabase.auth.signOut();
+      return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      user: { id: data.user.id, email: data.user.email, role: access.role },
     });
-
-    return response;
   } catch {
     return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
   }
