@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 
@@ -12,54 +11,38 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Dados obrigatórios em falta." }, { status: 400 });
     }
 
-    if (model === "PONTUAL" && (!Array.isArray(services) || services.length === 0) && !String(taskDetails || "").trim()) {
-      return NextResponse.json({ error: "Seleccione pelo menos uma área ou descreva a necessidade." }, { status: 400 });
+    const endpoint = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+    if (!endpoint) {
+      return NextResponse.json({ error: "Google Sheets não está configurado." }, { status: 500 });
     }
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) {
-      return NextResponse.json({ error: "Supabase não configurado." }, { status: 500 });
-    }
-
-    const supabase = createClient(url, key, { auth: { persistSession: false } });
-    const { data, error } = await supabase
-      .from("diagnostic_submissions")
-      .insert({
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         responsible,
         company,
         model,
         services: Array.isArray(services) ? services : [],
         tasks: tasks && typeof tasks === "object" ? tasks : {},
-        task_details: String(taskDetails || ""),
-        service_details: serviceDetails && typeof serviceDetails === "object" ? serviceDetails : {},
+        taskDetails: String(taskDetails || ""),
+        serviceDetails: serviceDetails && typeof serviceDetails === "object" ? serviceDetails : {},
         operations: operations && typeof operations === "object" ? operations : {},
         situation: situation && typeof situation === "object" ? situation : {},
-        objectives: objectives && typeof objectives === "object" ? objectives : {}
-      })
-      .select("id, submitted_at")
-      .single();
+        objectives: objectives && typeof objectives === "object" ? objectives : {},
+      }),
+    });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok || result.ok !== true) {
+      return NextResponse.json(
+        { error: result.error || "Não foi possível guardar o diagnóstico." },
+        { status: 502 }
+      );
     }
 
-    const functionUrl = process.env.SUPABASE_DIAGNOSTIC_NOTIFY_URL;
-    let notification = "queued";
-
-    if (functionUrl) {
-      const notify = await fetch(functionUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ submissionId: data.id })
-      });
-
-      if (!notify.ok) {
-        notification = "failed";
-      }
-    }
-
-    return NextResponse.json({ ok: true, id: data.id, notification }, { status: 201 });
+    return NextResponse.json({ ok: true, id: result.id || null }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Não foi possível submeter o diagnóstico." }, { status: 500 });
   }
