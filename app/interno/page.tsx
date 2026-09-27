@@ -1,50 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Brand } from "@/components/Brand";
 import { SiteFooter } from "@/components/SiteChrome";
 
 export default function InternoPage() {
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function login(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  useEffect(() => {
+    const value = new URLSearchParams(window.location.search).get("error");
+    if (value === "unauthorized") setError("Esta conta Google não está autorizada.");
+    else if (value) setError("Não foi possível validar o acesso.");
+  }, []);
+
+  function loginWithGoogle() {
     setLoading(true);
-    setError("");
-
-    try {
-      const r = await fetch("/api/interno/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
-      });
-
-      if (r.ok) {
-        window.location.href = "/interno/balcao";
-        return;
-      }
-
-      setError("Dados de acesso inválidos.");
-    } catch {
-      setError("Não foi possível validar o acesso.");
-    } finally {
-      setLoading(false);
-    }
+    window.location.href = "/api/interno/google";
   }
 
   return (
     <main className="acjl-page internal-page">
       <header className="acjl-top internal-login-top">
-        <Link href="/" aria-label="ACJL - página inicial">
-          <Brand compact />
-        </Link>
-        <Link href="/" className="internal-back">
-          ← Voltar
-        </Link>
+        <Link href="/" aria-label="ACJL - página inicial"><Brand compact /></Link>
+        <Link href="/" className="internal-back">← Voltar</Link>
       </header>
 
       <div className="acjl-wrap internal-login-wrap">
@@ -53,45 +33,23 @@ export default function InternoPage() {
             <div className="internal-login-mark" aria-hidden="true">A</div>
             <div className="acjl-eyebrow">ÁREA INTERNA</div>
           </div>
-
           <h1>Acesso Restrito</h1>
           <div className="internal-login-rule" />
 
-          <form onSubmit={login}>
-            <div className="internal-field">
-              <label htmlFor="identifier">E-mail</label>
-              <input
-                id="identifier"
-                type="text"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                autoComplete="username"
-                required
-              />
-            </div>
+          <p style={{margin: "0 0 20px", color: "var(--muted, #666)"}}>
+            Entre com a conta Google autorizada.
+          </p>
 
-            <div className="internal-field">
-              <label htmlFor="password">Senha</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-              />
-            </div>
+          {error && <div className="form-error" role="alert">{error}</div>}
 
-            {error && (
-              <div className="form-error" role="alert">
-                {error}
-              </div>
-            )}
-
-            <button className="acjl-button acjl-primary internal-login-button" disabled={loading}>
-              {loading ? "A entrar…" : "Entrar"}
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={loginWithGoogle}
+            className="acjl-button acjl-primary internal-login-button"
+            disabled={loading}
+          >
+            {loading ? "A abrir Google…" : "Continuar com Google"}
+          </button>
         </section>
       </div>
 
