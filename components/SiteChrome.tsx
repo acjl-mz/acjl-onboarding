@@ -7,7 +7,7 @@ export function SiteHeader({ step }: { step?: string }) {
       <Link href="/" aria-label="ACJL - página inicial">
         <Brand compact />
       </Link>
-      <RestrictedAccess />{step && <div className="acjl-label acjl-step-label">{step}</div>}
+      {step && <div className="acjl-label acjl-step-label">{step}</div>}
     </header>
   );
 }
