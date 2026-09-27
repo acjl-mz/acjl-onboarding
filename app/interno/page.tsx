@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { Brand } from "@/components/Brand";
 import { SiteFooter } from "@/components/SiteChrome";
@@ -11,7 +11,7 @@ export default function InternoPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function login(e: React.FormEvent) {
+  async function login(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError("");
