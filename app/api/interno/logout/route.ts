@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { clearInternalSession } from "@/lib/internal-auth";
 
 export const runtime = "nodejs";
 
 export async function POST() {
-  try {
-    const supabase = await createSupabaseServerClient();
-    await supabase.auth.signOut();
-  } finally {
-    return NextResponse.json({ ok: true });
-  }
+  await clearInternalSession();
+  return NextResponse.json({ ok: true });
 }
