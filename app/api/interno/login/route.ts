@@ -12,9 +12,7 @@ export async function POST(request: Request) {
     const token = process.env.INTERNAL_ACCESS_TOKEN;
 
     const normalizedIdentifier = String(identifier || "").trim().toLowerCase();
-    const validIdentifier =
-      (expectedEmail && normalizedIdentifier === expectedEmail) ||
-      (expectedPhone && String(identifier || "").trim() === expectedPhone);
+    const validEmail = Boolean(expectedEmail && normalizedIdentifier === expectedEmail);\n    const validPhone = Boolean(expectedPhone && String(identifier || "").trim() === expectedPhone);\n    const validIdentifier = validEmail || validPhone;
 
     if (!expectedPassword || !token || !validIdentifier || password !== expectedPassword) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 401 });
