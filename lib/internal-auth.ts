@@ -2,24 +2,21 @@ import { cookies } from "next/headers";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 const COOKIE_NAME = "acjl-internal-session";
-const ADMIN_EMAIL = "acjl.corporate@gmail.com";
+export const ADMIN_EMAIL = "acjl.corporate@gmail.com";
 
-function getPassword() {
-  return process.env.ACJL_INTERNAL_ADMIN_PASSWORD || "";
+function signingSecret() {
+  return process.env.ACJL_INTERNAL_AUTH_SECRET || process.env.GOOGLE_CLIENT_SECRET || "acjl-internal";
 }
 
 function signature(email: string) {
-  const secret = process.env.ACJL_INTERNAL_AUTH_SECRET || getPassword();
-  return createHmac("sha256", secret).update(email).digest("hex");
+  return createHmac("sha256", signingSecret()).update(email).digest("hex");
 }
 
-export function authenticateAdmin(email: string, password: string) {
-  return email.trim().toLowerCase() === ADMIN_EMAIL && !!getPassword() && password === getPassword();
-}
+export async function createInternalSession(email = ADMIN_EMAIL) {
+  const normalized = email.trim().toLowerCase();
+  if (normalized !== ADMIN_EMAIL) throw new Error("Unauthorized");
 
-export async function createInternalSession() {
-  const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, `${ADMIN_EMAIL}.${signature(ADMIN_EMAIL)}`, {
+  (await cookies()).set(COOKIE_NAME, `${ADMIN_EMAIL}.${signature(ADMIN_EMAIL)}`, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
