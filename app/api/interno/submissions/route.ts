@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
@@ -13,18 +12,11 @@ export async function GET() {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
-    const admin = createSupabaseAdminClient();
-    const { data: access, error: accessError } = await admin
-      .from("internal_users")
-      .select("role, active")
-      .eq("user_id", auth.user.id)
-      .eq("active", true)
-      .maybeSingle();
-
-    if (accessError || !access) {
+    if (auth.user.email?.toLowerCase() !== "acjl.corporate@gmail.com") {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
 
+    const admin = createSupabaseAdminClient();
     const { data, error } = await admin
       .from("diagnostic_submissions")
       .select("*")
