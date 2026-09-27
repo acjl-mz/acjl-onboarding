@@ -59,7 +59,7 @@ export default function InternoPage() {
 
           <form onSubmit={login}>
             <div className="internal-field">
-              <label htmlFor="identifier">E-mail ou celular</label>
+              <label htmlFor="identifier">E-mail</label>
               <input
                 id="identifier"
                 type="text"
