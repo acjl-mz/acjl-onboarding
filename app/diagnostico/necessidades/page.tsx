@@ -61,11 +61,6 @@ export default function NecessidadesPage() {
       serviceDetails: {
         ...x.serviceDetails,
         [service]: {
-          currentState: "",
-          frequency: "",
-          volume: "",
-          urgency: "",
-          notes: "",
           ...(x.serviceDetails?.[service] || {}),
           [key]: value,
         },
