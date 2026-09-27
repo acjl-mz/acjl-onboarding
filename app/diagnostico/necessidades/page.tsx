@@ -85,6 +85,24 @@ export default function NecessidadesPage() {
       return;
     }
 
+    if (
+      d.model === "PONTUAL" &&
+      d.services.some((service) => {
+        const detail = d.serviceDetails?.[service];
+        return (
+          !detail?.currentState ||
+          !detail?.frequency ||
+          !detail?.volume ||
+          !detail?.urgency
+        );
+      })
+    ) {
+      setError(
+        "Complete os campos de dimensionamento das áreas seleccionadas antes de continuar.",
+      );
+      return;
+    }
+
     saveDiagnostic(d);
     window.location.href = "/diagnostico/situacao";
   };
