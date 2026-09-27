@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const { identifier, password } = await request.json().catch(() => ({}));
 
     const expectedPassword = process.env.INTERNAL_ACCESS_PASSWORD;
-    const expectedEmail = (process.env.INTERNAL_ACCESS_EMAIL || "acjl.corporate@gmail.com").trim().toLowerCase();
+    const expectedEmail = "acjl.corporate@gmail.com";
     const expectedPhone = process.env.INTERNAL_ACCESS_PHONE?.trim();
     const token = process.env.INTERNAL_ACCESS_TOKEN;
 
