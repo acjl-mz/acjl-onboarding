@@ -94,7 +94,6 @@ export default function BriefingPage() {
           <section className="acjl-card diagnostic-card">
             <div className="acjl-eyebrow">ETAPA 4 · RECOLHA TÉCNICA</div>
             <h1>Aprofundamento pelo consultor.</h1>
-            <p>Não vamos repetir o que já foi respondido. Esta etapa acrescenta apenas informação técnica que ajuda a ACJL a dimensionar o trabalho.</p>
 
             <div className="short-section">
               <h3>Registo do briefing</h3>
@@ -116,7 +115,6 @@ export default function BriefingPage() {
 
             <div className="short-section">
               <h3>Informação complementar</h3>
-              <p>As perguntas abaixo não repetem os dados do formulário. Escolha a opção que melhor descreve o que o consultor verificou.</p>
 
               <div className="acjl-field">
                 <label>Sistemas e ferramentas utilizados *</label>
