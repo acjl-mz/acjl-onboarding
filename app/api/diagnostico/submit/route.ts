@@ -33,7 +33,19 @@ export async function POST(request: Request) {
     const endpoint = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
     if (!endpoint) return NextResponse.json({ error: "Google Sheets não está configurado." }, { status: 500 });
 
-    const payload = {\n      schemaVersion: "1.0",\n      event: "DIAGNOSTIC_SUBMITTED",\n      diagnosticId: typeof body.diagnosticId === "string" && body.diagnosticId ? body.diagnosticId : makeDiagnosticId(),\n      submittedAt: new Date().toISOString(),\n      source: diagnosticType === "BRIEFING_ACJL" ? "BRIEFING_ACJL" : "CLIENTE_AUTO",\n      data: body,\n    };\n\n    const response = await fetch(endpoint, {
+    const payload = {
+      schemaVersion: "1.0",
+      event: "DIAGNOSTIC_SUBMITTED",
+      diagnosticId:
+        typeof body.diagnosticId === "string" && body.diagnosticId
+          ? body.diagnosticId
+          : crypto.randomUUID(),
+      submittedAt: new Date().toISOString(),
+      source: diagnosticType === "BRIEFING_ACJL" ? "BRIEFING_ACJL" : "CLIENTE_AUTO",
+      data: body,
+    };
+
+    const response = await fetch(endpoint, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload), cache: "no-store",
     });
