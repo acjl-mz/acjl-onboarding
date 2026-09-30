@@ -68,7 +68,7 @@ export default function RevisaoPage() {
 
   return (
     <main className="acjl-page">
-      <SiteHeader step="6 DE 6 · CONFIRMAÇÃO" />
+      <SiteHeader step={d.diagnosticType === "BRIEFING_ACJL" ? "7 DE 7 · CONFIRMAÇÃO" : "6 DE 6 · CONFIRMAÇÃO"} />
 
       <div className="acjl-wrap diagnostic-shell">
         <div className="acjl-form">
@@ -77,7 +77,7 @@ export default function RevisaoPage() {
           </div>
 
           <section className="acjl-card diagnostic-card review-card">
-            <div className="acjl-eyebrow">ETAPA 7 · CONFIRMAÇÃO</div>
+            <div className="acjl-eyebrow">{d.diagnosticType === "BRIEFING_ACJL" ? "ETAPA 7 · CONFIRMAÇÃO" : "ETAPA 6 · CONFIRMAÇÃO"}</div>
             <h1>Confirme as informações.</h1>
             <p>
               Reveja os dados antes de enviar. Estas informações serão usadas
