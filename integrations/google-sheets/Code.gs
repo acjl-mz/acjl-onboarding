@@ -446,7 +446,7 @@ function sectionHtml_(title, fields) {
     .map(item =>
       "<tr>" +
       "<td style='padding:9px 12px;border-bottom:1px solid #eee;color:#666;width:35%;vertical-align:top;'>" + esc_(item[0]) + "</td>" +
-      "<td style='padding:9px 12px;border-bottom:1px solid #eee;color:#222;vertical-align:top;'>" + nl2br_(item[1]) + "</td>" +
+      "<td style='padding:9px 12px;border-bottom:1px solid #eee;color:#222;vertical-align:top;'>" + nl2br_(displayObjectValue_(item[1])) + "</td>" +
       "</tr>"
     ).join("");
 
@@ -542,31 +542,59 @@ function objectText_(value) {
 
 function humanizeKey_(key) {
   const labels = {
-    // Organização interna
+    diagnosticId: "ID do diagnóstico",
+    diagnosticType: "Tipo de diagnóstico",
+
+    fullName: "Nome",
+    role: "Relação com a empresa",
+    phone: "Telefone",
+    email: "E-mail",
+    preferredChannel: "Canal preferencial",
+
+    legalName: "Razão social",
+    tradeName: "Nome comercial",
+    nuit: "NUIT",
+    organizationType: "Tipo de entidade",
+    sector: "Sector",
+    mainActivity: "Actividade principal",
+    activityDescription: "Descrição da actividade",
+    incorporationYear: "Ano de constituição",
+    activityStartYear: "Ano de início da actividade",
+    location: "Localização",
+    establishments: "Estabelecimentos",
+    employeeRange: "N.º de colaboradores",
+    activityVolume: "Volume de actividade",
+
+    model: "Modelo de contratação",
+    services: "Serviços",
+    tasks: "Tarefas",
+    taskDetails: "Detalhes das tarefas",
+    serviceDetails: "Dimensionamento dos serviços",
+
+    operations: "Organização interna",
     routines: "Rotinas definidas",
     processes: "Processos e procedimentos",
     collection: "Recolha e organização da informação",
     treatment: "Tratamento e transformação da informação",
     management: "Acompanhamento, controlo e gestão da informação",
 
-    // Situação actual
+    situation: "Situação actual",
     provider: "Prestador actual",
     providerScope: "O que pretende manter, melhorar ou alterar",
     motivation: "Motivação para procurar apoio",
     pending: "Assuntos pendentes",
 
-    // Dimensionamento dos serviços
     currentState: "Situação actual",
     frequency: "Frequência",
     volume: "Volume",
     urgency: "Urgência",
     notes: "Observações",
 
-    // Objectivos
+    objectives: "Objectivos",
     main: "Principal resultado pretendido",
     recommendation: "Recomendação da ACJL sobre o modelo de contratação",
 
-    // Briefing ACJL
+    consultantBriefing: "Briefing ACJL",
     consultantName: "Consultor ACJL",
     briefingDate: "Data do briefing",
     duration: "Duração do briefing",
@@ -587,8 +615,56 @@ function humanizeKey_(key) {
   return raw
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/[_-]+/g, " ")
-    .replace(/\\s+/g, " ")
+    .replace(/\s+/g, " ")
     .replace(/^./, s => s.toUpperCase());
+}
+
+function humanizeValue_(value) {
+  if (!hasValue_(value)) return "";
+
+  const values = {
+    AVENCA: "Apoio contínuo · Avença mensal",
+    PONTUAL: "Serviço pontual",
+    RECOMENDACAO: "Ainda não sei · Recomende-me",
+    CLIENTE_AUTO: "Preenchimento pelo cliente",
+    BRIEFING_ACJL: "Briefing conduzido pela ACJL",
+    sim: "Sim",
+    nao: "Não",
+    "não": "Não",
+    yes: "Sim",
+    no: "Não",
+    diaria: "Diária",
+    semanal: "Semanal",
+    quinzenal: "Quinzenal",
+    mensal: "Mensal",
+    trimestral: "Trimestral",
+    semestral: "Semestral",
+    anual: "Anual",
+    pontual: "Pontual",
+    ocasional: "Ocasional",
+    baixa: "Baixa",
+    media: "Média",
+    "média": "Média",
+    alta: "Alta",
+    urgente: "Urgente"
+  };
+
+  const raw = String(value);
+  return Object.prototype.hasOwnProperty.call(values, raw) ? values[raw] : raw;
+}
+
+function displayObjectValue_(value) {
+  if (!hasValue_(value)) return "";
+
+  if (Array.isArray(value)) {
+    return value.map(item => humanizeValue_(item)).join(" · ");
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "Sim" : "Não";
+  }
+
+  return humanizeValue_(value);
 }
 
 function arrayText_(value) {
