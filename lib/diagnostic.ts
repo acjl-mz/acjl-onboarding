@@ -1,5 +1,7 @@
-export type DiagnosticData={responsible:{fullName:string;role:string;phone:string;email:string;preferredChannel:string};company:{legalName:string;tradeName:string;nuit:string;organizationType:string;sector:string;mainActivity:string;activityDescription:string;incorporationYear:string;activityStartYear:string;location:string;establishments:string;employeeRange:string;activityVolume:string};model:"AVENCA"|"PONTUAL"|"";services:string[];tasks:Record<string,string[]>;taskDetails:string;serviceDetails:Record<string,{currentState:string;frequency:string;volume:string;urgency:string;notes:string}>;operations:{routines:string;processes:string;collection:string;treatment:string;management:string};situation:{provider:string;providerScope:string;motivation:string;pending:string};objectives:{main:string;recommendation:boolean}};
-export const initialDiagnostic:DiagnosticData={responsible:{fullName:"",role:"",phone:"",email:"",preferredChannel:""},company:{legalName:"",tradeName:"",nuit:"",organizationType:"",sector:"",mainActivity:"",activityDescription:"",incorporationYear:"",activityStartYear:"",location:"",establishments:"",employeeRange:"",activityVolume:""},model:"",services:[],tasks:{},taskDetails:"",serviceDetails:{},operations:{routines:"",processes:"",collection:"",treatment:"",management:""},situation:{provider:"",providerScope:"",motivation:"",pending:""},objectives:{main:"",recommendation:false}};
+export type DiagnosticMode="CLIENTE_AUTO"|"BRIEFING_ACJL";
+export type ConsultantBriefing={consultantName:string;briefingDate:string;duration:string;notes:string;assessment:Record<string,string>};
+export type DiagnosticData={diagnosticType:DiagnosticMode;responsible:{fullName:string;role:string;phone:string;email:string;preferredChannel:string};company:{legalName:string;tradeName:string;nuit:string;organizationType:string;sector:string;mainActivity:string;activityDescription:string;incorporationYear:string;activityStartYear:string;location:string;establishments:string;employeeRange:string;activityVolume:string};model:"AVENCA"|"PONTUAL"|"";services:string[];tasks:Record<string,string[]>;taskDetails:string;serviceDetails:Record<string,{currentState:string;frequency:string;volume:string;urgency:string;notes:string}>;operations:{routines:string;processes:string;collection:string;treatment:string;management:string};situation:{provider:string;providerScope:string;motivation:string;pending:string};objectives:{main:string;recommendation:boolean}};
+export const initialDiagnostic:DiagnosticData={diagnosticType:"CLIENTE_AUTO",responsible:{fullName:"",role:"",phone:"",email:"",preferredChannel:""},company:{legalName:"",tradeName:"",nuit:"",organizationType:"",sector:"",mainActivity:"",activityDescription:"",incorporationYear:"",activityStartYear:"",location:"",establishments:"",employeeRange:"",activityVolume:""},model:"",services:[],tasks:{},taskDetails:"",serviceDetails:{},operations:{routines:"",processes:"",collection:"",treatment:"",management:""},situation:{provider:"",providerScope:"",motivation:"",pending:""},objectives:{main:"",recommendation:false},consultantBriefing:{consultantName:"",briefingDate:"",duration:"",notes:"",assessment:{}}};
 export function readDiagnostic():DiagnosticData{
   if(typeof window==="undefined") return initialDiagnostic;
   try{
@@ -15,7 +17,8 @@ export function readDiagnostic():DiagnosticData{
       serviceDetails:raw.serviceDetails&&typeof raw.serviceDetails==="object"?raw.serviceDetails:{},
       operations:{...initialDiagnostic.operations,...(raw.operations||{})},
       situation:{...initialDiagnostic.situation,...(raw.situation||{})},
-      objectives:{...initialDiagnostic.objectives,...(raw.objectives||{})}
+      objectives:{...initialDiagnostic.objectives,...(raw.objectives||{})},
+      consultantBriefing:{...(initialDiagnostic as any).consultantBriefing,...(raw.consultantBriefing||{})}
     };
   }catch{return initialDiagnostic}
 }
