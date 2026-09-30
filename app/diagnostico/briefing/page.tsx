@@ -29,16 +29,24 @@ const riskOptions = ["Pendências em atraso", "Documentação incompleta", "Proc
 
 export default function BriefingPage() {
   const d = readDiagnostic();
+  const stored = d.consultantBriefing;
+  const storedAssessment = stored?.assessment;
   const [b, setB] = useState<Briefing>({
     ...initial,
-    ...(d.consultantBriefing as Partial<Briefing> || {}),
-    dependencies: Array.isArray(d.consultantBriefing?.assessment?.dependencies)
-      ? d.consultantBriefing.assessment.dependencies.split(" | ").filter(Boolean)
+    consultantName: stored?.consultantName || "",
+    briefingDate: stored?.briefingDate || "",
+    duration: stored?.duration || "",
+    systems: storedAssessment?.systems || "",
+    documentFlow: storedAssessment?.documentFlow || "",
+    internalControls: storedAssessment?.internalControls || "",
+    dependencies: storedAssessment?.dependencies
+      ? storedAssessment.dependencies.split(" | ").filter(Boolean)
       : [],
-    risks: Array.isArray(d.consultantBriefing?.assessment?.risks)
-      ? d.consultantBriefing.assessment.risks.split(" | ").filter(Boolean)
+    seasonality: storedAssessment?.seasonality || "",
+    risks: storedAssessment?.risks
+      ? storedAssessment.risks.split(" | ").filter(Boolean)
       : [],
-    assessment: d.consultantBriefing?.assessment?.assessment || "",
+    assessment: storedAssessment?.assessment || "",
   });
   const [error, setError] = useState("");
 
