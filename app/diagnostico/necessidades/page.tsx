@@ -25,7 +25,7 @@ export default function NecessidadesPage() {
   const [error, setError] = useState("");
   const isBriefing = d.diagnosticType === "BRIEFING_ACJL";
 
-  const setModel = (model: "AVENCA" | "PONTUAL") => {
+  const setModel = (model: "AVENCA" | "PONTUAL" | "RECOMENDACAO") => {
     setD((x) => ({
       ...x,
       model,
@@ -153,7 +153,34 @@ export default function NecessidadesPage() {
                   formação ou outra necessidade específica.
                 </span>
               </button>
+
+              <button
+                type="button"
+                className={
+                  "model-option " + (d.model === "RECOMENDACAO" ? "active" : "")
+                }
+                onClick={() => setModel("RECOMENDACAO")}
+              >
+                <strong>Ainda não sei · Recomende-me</strong>
+                <span>
+                  Não tem a certeza do serviço ou do modelo de apoio. Recolheremos
+                  os dados necessários e a ACJL fará a recomendação.
+                </span>
+              </button>
             </div>
+
+            {d.model === "RECOMENDACAO" && (
+              <div className="locked-package">
+                <div className="acjl-eyebrow">RECOMENDAÇÃO ACJL</div>
+                <h2>Não precisa de decidir agora.</h2>
+                <p>
+                  Continue o diagnóstico normalmente. Usaremos as informações
+                  sobre a empresa, a operação, a situação actual e os seus
+                  objectivos para indicar o modelo e o nível de apoio mais
+                  adequado.
+                </p>
+              </div>
+            )}
 
             {d.model === "AVENCA" && (
               <div className="locked-package">
@@ -175,6 +202,11 @@ export default function NecessidadesPage() {
                     Valor de entrada. O preço final é definido após a avaliação
                     da realidade e das necessidades da empresa.
                   </span>
+                </div>
+                <div className="selection-note">
+                  Para não repetir perguntas, o dimensionamento da avença será
+                  feito com base na dimensão da empresa, na organização interna,
+                  na necessidade identificada e na análise técnica da ACJL.
                 </div>
               </div>
             )}
