@@ -76,7 +76,7 @@ export default function RevisaoPage() {
             <span style={{ width: "100%" }} />
           </div>
 
-          <section className="acjl-card diagnostic-card">
+          <section className="acjl-card diagnostic-card review-card">
             <div className="acjl-eyebrow">ETAPA 7 · CONFIRMAÇÃO</div>
             <h1>Confirme as informações.</h1>
             <p>
@@ -231,14 +231,19 @@ export default function RevisaoPage() {
               </div>
             </div>
 
-            <div className="report-actions">
-              <Link
-                href="/diagnostico/revisao?print=1"
-                className="acjl-button acjl-secondary"
-                target="_blank"
+            <div className="review-toolbar">
+              <div className="review-toolbar-copy">
+                <strong>Relatório do diagnóstico</strong>
+                <span>Imprima o relatório ou escolha “Guardar como PDF” na janela de impressão.</span>
+              </div>
+              <button
+                type="button"
+                className="acjl-button acjl-secondary review-print-button"
+                onClick={() => window.print()}
               >
-                Abrir relatório para impressão / PDF
-              </Link>
+                <span aria-hidden="true">▣</span>
+                Imprimir / Guardar PDF
+              </button>
             </div>
 
             <label className="check-line">
