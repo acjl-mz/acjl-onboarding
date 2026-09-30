@@ -51,6 +51,14 @@ export default function RevisaoPage() {
 
   const serviceDetails = d.serviceDetails || {};
   const briefing = d.consultantBriefing || {};
+  const labelMap: Record<string, string> = {
+    currentState: "Situação actual",
+    frequency: "Frequência",
+    volume: "Volume",
+    urgency: "Urgência",
+    notes: "Observações",
+  };
+
   const tasks = Object.entries(d.tasks || {}).flatMap(([service, serviceTasks]) =>
     (Array.isArray(serviceTasks) ? serviceTasks : []).map(
       (task) => service + ": " + task,
@@ -156,9 +164,9 @@ export default function RevisaoPage() {
                           {details && (
                             <>
                               <br />
-                              Estado: {details.currentState || "—"} ·
-                              Frequência: {details.frequency || "—"} · Volume:{" "}
-                              {details.volume || "—"} · Urgência:{" "}
+                              {labelMap.currentState}: {details.currentState || "—"} ·
+                              {labelMap.frequency}: {details.frequency || "—"} · {labelMap.volume}:{" "}
+                              {details.volume || "—"} · {labelMap.urgency}:{" "}
                               {details.urgency || "—"}
                               {details.notes && (
                                 <>
