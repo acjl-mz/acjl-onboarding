@@ -30,7 +30,7 @@ const riskOptions = ["Pendências em atraso", "Documentação incompleta", "Proc
 export default function BriefingPage() {
   const d = readDiagnostic();
   const stored = d.consultantBriefing;
-  const storedAssessment = stored?.assessment;
+  const storedAssessment = stored?.assessment ?? {};
   const [b, setB] = useState<Briefing>({
     ...initial,
     consultantName: stored?.consultantName || "",
