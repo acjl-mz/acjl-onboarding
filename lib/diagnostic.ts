@@ -8,6 +8,7 @@ export type ConsultantBriefing = {
 };
 
 export type DiagnosticData = {
+  diagnosticId: string;
   diagnosticType: DiagnosticMode;
   responsible: { fullName:string; role:string; phone:string; email:string; preferredChannel:string };
   company: {
@@ -27,6 +28,7 @@ export type DiagnosticData = {
 };
 
 export const initialDiagnostic: DiagnosticData = {
+  diagnosticId:"",
   diagnosticType:"CLIENTE_AUTO",
   responsible:{fullName:"",role:"",phone:"",email:"",preferredChannel:""},
   company:{legalName:"",tradeName:"",nuit:"",organizationType:"",sector:"",mainActivity:"",activityDescription:"",
@@ -38,6 +40,11 @@ export const initialDiagnostic: DiagnosticData = {
   consultantBriefing:{consultantName:"",briefingDate:"",duration:"",notes:"",assessment:{}}
 };
 
+function newDiagnosticId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  return "diag-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+}
+
 export function readDiagnostic(): DiagnosticData {
   if (typeof window === "undefined") return initialDiagnostic;
 
@@ -47,6 +54,7 @@ export function readDiagnostic(): DiagnosticData {
 
     return {
       ...initialDiagnostic,
+      diagnosticId: typeof raw.diagnosticId === "string" && raw.diagnosticId ? raw.diagnosticId : newDiagnosticId(),
       ...raw,
       responsible:{...initialDiagnostic.responsible,...(raw.responsible || {})},
       company:{...initialDiagnostic.company,...(raw.company || {})},
@@ -66,7 +74,7 @@ export function readDiagnostic(): DiagnosticData {
       }
     };
   } catch {
-    return initialDiagnostic;
+    return { ...initialDiagnostic, diagnosticId: newDiagnosticId() };
   }
 }
 
