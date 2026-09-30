@@ -3,7 +3,7 @@ const SHEETS = {
   CONSULTANT: "Briefings ACJL",
 };
 
-const COPY_EMAIL = "al.andrelangaa@gmail.com";
+const COPY_EMAIL = "acjl.corporate@gmail.com";
 
 const HEADERS = [
   "ID da submissão",
