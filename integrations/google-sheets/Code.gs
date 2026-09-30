@@ -277,10 +277,6 @@ function appendRecord_(sheet, record) {
   });
 }
 
-function arrayText_(value) {
-  return Array.isArray(value) ? value.join(" | ") : "";
-}
-
 function jsonText_(value) {
   try {
     return JSON.stringify(value);
