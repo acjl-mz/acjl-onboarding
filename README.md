@@ -11,7 +11,8 @@ Transformar a realidade e as necessidades de uma empresa interessada em uma solu
 ## Stack
 
 - Next.js + TypeScript
-- Supabase: PostgreSQL, Auth e Storage
+- Google Sheets + Google Apps Script: armazenamento e entrada dos diagnósticos
+- Supabase: infraestrutura legada/preparada para evolução futura
 - Vercel: deploy
 - Zod: validação
 - React Hook Form: formulários
@@ -23,7 +24,7 @@ Transformar a realidade e as necessidades de uma empresa interessada em uma solu
 |---|---|---|
 | Development | Local | Supabase Development |
 | Preview | Vercel Preview | Supabase Staging/Development |
-| Production | Vercel Production | Supabase Production |
+| Production | Vercel Production | Google Sheets + Apps Script |
 
 Os segredos nunca devem ser commitados. Use `.env.local` localmente e variáveis de ambiente da Vercel nos ambientes remotos.
 
@@ -52,4 +53,4 @@ Consulte `docs/deployment/ENVIRONMENTS.md`.
 
 ## Estado inicial
 
-Foundation em construção. As funcionalidades serão ativadas progressivamente sobre uma arquitetura completa.
+Estado actual: o formulário de diagnóstico está operacional em Vercel e usa Google Sheets + Google Apps Script como armazenamento de submissões. A infraestrutura Supabase permanece no repositório para evolução futura.
