@@ -105,7 +105,7 @@ export default function NecessidadesPage() {
     }
 
     saveDiagnostic(d);
-    window.location.href = "/diagnostico/situacao";
+    window.location.href = d.diagnosticType === "BRIEFING_ACJL" ? "/diagnostico/briefing" : "/diagnostico/situacao";
   };
 
   return (
