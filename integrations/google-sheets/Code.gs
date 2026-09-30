@@ -79,6 +79,7 @@ function doPost(e) {
     }
 
     appendRecord_(sheet, record);
+    SpreadsheetApp.flush();
 
     let emailSent = true;
     let emailError = "";
@@ -94,13 +95,13 @@ function doPost(e) {
       ok: true,
       id: id,
       sheet: sheet.getName(),
-      emailSent: emailSent,
-      emailError: emailError
+      emailSent: emailSent
     });
   } catch (error) {
+    console.error("Falha no processamento do diagnóstico:", error);
     return json_({
       ok: false,
-      error: error instanceof Error ? error.message : String(error)
+      error: "Não foi possível concluir o registo do diagnóstico."
     });
   } finally {
     try {
@@ -370,20 +371,21 @@ function buildDiagnosticEmailHtml_(data, id, submittedAt, sheetName, mode) {
   ].join("");
 
   if (data.diagnosticType === "BRIEFING_ACJL") {
+    const assessment = b.assessment || {};
+
     html += sectionHtml_("Briefing ACJL", [
       ["Consultor", b.consultantName],
       ["Data do briefing", b.briefingDate],
       ["Duração", b.duration],
-      ["Sistemas e ferramentas", b.systemsTools],
-      ["Fluxo documental / informação", b.documentInformationFlow],
-      ["Controlos internos", b.internalControls],
-      ["Sazonalidade", b.seasonality],
-      ["Dependências", b.dependencies],
-      ["Riscos / pontos de atenção", b.risksAttention],
-      ["Nota técnica", b.technicalNote],
+      ["Sistemas e ferramentas", assessment.systems],
+      ["Fluxo de documentos e informação", assessment.documentFlow],
+      ["Controlos internos", assessment.internalControls],
+      ["Sazonalidade ou períodos críticos", assessment.seasonality],
+      ["Dependências", assessment.dependencies],
+      ["Pontos de atenção", assessment.risks],
+      ["Observação técnica", assessment.assessment],
       ["Notas", b.notes]
     ]);
-    html += objectSectionHtml_("Avaliação técnica do consultor", b.assessment);
   }
 
   html += [
@@ -556,6 +558,13 @@ function humanizeKey_(key) {
     providerScope: "O que pretende manter, melhorar ou alterar",
     motivation: "Motivação para procurar apoio",
     pending: "Assuntos pendentes",
+
+    // Dimensionamento dos serviços
+    currentState: "Situação actual",
+    frequency: "Frequência",
+    volume: "Volume",
+    urgency: "Urgência",
+    notes: "Observações",
 
     // Objectivos
     main: "Principal resultado pretendido",
