@@ -60,11 +60,12 @@ function doPost(e) {
   try {
     lock.waitLock(30000);
 
-    const data = parsePayload_(e);
+    const envelope = parsePayload_(e);
+    const data = envelope.data || envelope;
     validatePayload_(data);
 
-    const id = Utilities.getUuid();
-    const now = new Date();
+    const id = envelope.diagnosticId || Utilities.getUuid();
+    const now = envelope.submittedAt ? new Date(envelope.submittedAt) : new Date();
     const sheet = getSheetForType_(data.diagnosticType);
 
     ensureHeaders_(sheet);
@@ -112,7 +113,7 @@ function validatePayload_(data) {
     throw new Error("Dados do responsável ou da empresa em falta.");
   }
 
-  if (!["AVENCA", "PONTUAL"].includes(data.model)) {
+  if (!["AVENCA", "PONTUAL", "RECOMENDACAO"].includes(data.model)) {
     throw new Error("Modelo de contratação inválido.");
   }
 
