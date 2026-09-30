@@ -203,22 +203,11 @@ export default function NecessidadesPage() {
                     da realidade e das necessidades da empresa.
                   </span>
                 </div>
-                <div className="selection-note">
-                  Para não repetir perguntas, o dimensionamento da avença será
-                  feito com base na dimensão da empresa, na organização interna,
-                  na necessidade identificada e na análise técnica da ACJL.
-                </div>
               </div>
             )}
 
             {d.model === "PONTUAL" && (
               <>
-                <div className="selection-note">
-                  Seleccione primeiro as áreas e depois as tarefas que pretende
-                  tratar. Incluímos abaixo situações e pedidos frequentemente
-                  procurados pelas empresas.
-                </div>
-
                 <div className="service-grid">
                   {services.map((service) => {
                     const selected = d.services.includes(service);
