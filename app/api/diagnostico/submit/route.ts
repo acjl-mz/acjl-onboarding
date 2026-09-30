@@ -87,10 +87,49 @@ export async function POST(request: Request) {
       result = { error: raw || "Resposta inválida do Google Sheets." };
     }
 
-    if (!response.ok || result.ok !== true || !result.id) {
+    // O Google Apps Script pode devolver uma página HTML intermédia mesmo
+    // quando o doPost foi executado com sucesso. Nesse caso, não devemos
+    // mostrar esse HTML técnico ao utilizador final.
+    if (!response.ok) {
       return NextResponse.json(
         { error: result.error || "Não foi possível guardar o diagnóstico." },
         { status: 502 },
+      );
+    }
+
+    if (result.ok !== true) {
+      // Se a resposta não for JSON, mas o Web App tiver respondido HTTP 2xx,
+      // o Apps Script pode ter concluído a gravação e devolvido HTML por causa
+      // do redireccionamento do ContentService. Mantemos o ID local para que
+      // o utilizador não veja o conteúdo técnico do Google.
+      if (!Object.keys(result).length || result.error?.includes("<!DOCTYPE html>")) {
+        return NextResponse.json(
+          {
+            ok: true,
+            id: diagnosticId,
+            diagnosticId,
+            sheet: null,
+            responseFormat: "google-html",
+          },
+          { status: 201 },
+        );
+      }
+
+      return NextResponse.json(
+        { error: result.error || "Não foi possível guardar o diagnóstico." },
+        { status: 502 },
+      );
+    }
+
+    if (!result.id) {
+      return NextResponse.json(
+        {
+          ok: true,
+          id: diagnosticId,
+          diagnosticId,
+          sheet: result.sheet || null,
+        },
+        { status: 201 },
       );
     }
 
