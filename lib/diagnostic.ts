@@ -15,7 +15,7 @@ export type DiagnosticData = {
     mainActivity:string; activityDescription:string; incorporationYear:string; activityStartYear:string;
     location:string; establishments:string; employeeRange:string; activityVolume:string;
   };
-  model: "AVENCA" | "PONTUAL" | "";
+  model: "AVENCA" | "PONTUAL" | "RECOMENDACAO" | "";
   services: string[];
   tasks: Record<string,string[]>;
   taskDetails: string;
