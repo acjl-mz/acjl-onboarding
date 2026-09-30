@@ -1,48 +1,58 @@
 # Google Sheets — ACJL Onboarding
 
-Esta integração usa um **Google Apps Script Web App** como endpoint de entrada.
+A integração usa um **Google Apps Script Web App** como endpoint de entrada.
 
-## 1. Criar a folha
+## Estrutura
 
-1. Crie uma Google Sheet usando a conta que receberá os diagnósticos.
-2. Abra **Extensões → Apps Script**.
-3. Substitua o conteúdo do editor pelo ficheiro `Code.gs`.
-4. Guarde o projecto.
+Um único workbook Google Sheets contém duas folhas:
 
-A folha será criada automaticamente com o nome **Diagnósticos** na primeira submissão.
+- **ACJL - Diagnosticos** — preenchimento autónomo pela empresa.
+- **ACJL - Briefing** — diagnóstico conduzido por consultor ACJL.
 
-## 2. Publicar
+O script selecciona automaticamente a folha com base em `diagnosticType`.
 
-No Apps Script:
+## Configuração do workbook
 
-**Deploy → New deployment → Web app**
+No Apps Script, em **Project Settings → Script properties**, crie:
 
-Use:
-- **Execute as:** Me
-- **Who has access:** Anyone
+- **Name:** `SPREADSHEET_ID`
+- **Value:** o ID do workbook que contém as duas folhas.
 
-O Web App precisa aceitar chamadas do formulário público.
+O ID é o trecho entre `/d/` e `/edit` no URL do Google Sheets.
 
-Copie a URL terminada em `/exec`.
+Exemplo:
 
-## 3. Ligar ao Vercel
+`https://docs.google.com/spreadsheets/d/ABC123XYZ/edit`
 
-No projecto Vercel `acjl-onboarding`, crie a variável:
+ID:
+
+`ABC123XYZ`
+
+O Web App deve ser publicado para **Execute as: Me** e **Who has access: Anyone**, para permitir a submissão pública.
+
+## Ligação ao Vercel
+
+No projecto Vercel `acjl-onboarding`, configurar:
 
 `GOOGLE_SHEETS_WEBHOOK_URL`
 
-com a URL `/exec` do Web App.
+com a URL do Web App terminada em `/exec`.
 
-Depois faça um novo deployment.
-
-## 4. Notificação
+## Funcionamento
 
 Cada submissão:
-1. é adicionada à folha **Diagnósticos**;
-2. gera uma cópia por e-mail para **acjl.corporate@gmail.com**.
 
-Não é necessário Supabase para o armazenamento do formulário.
+1. é validada;
+2. é gravada na folha correspondente;
+3. mantém uma cópia integral em **Dados completos (JSON)**;
+4. tenta enviar uma cópia por e-mail para `acjl.corporate@gmail.com`.
+
+A falha do e-mail **não invalida uma gravação que já foi realizada**.
+
+O `diagnosticId` é persistido durante o preenchimento e usado para evitar a criação de um segundo registo quando a mesma submissão é reenviada.
 
 ## Segurança
 
-A URL do Web App é pública para permitir que o formulário seja submetido sem login. O endpoint deve ser usado apenas para este formulário.
+A URL do Apps Script é pública porque o formulário público precisa de a chamar indirectamente através do servidor Vercel. O código de acesso do briefing é validado no servidor Vercel antes de permitir a área de consultor.
+
+Não colocar IDs, códigos de acesso ou outros segredos no código-fonte.
