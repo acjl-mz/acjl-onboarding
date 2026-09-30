@@ -58,3 +58,13 @@
 .internal-field input:focus{border-color:var(--acjl-blue);box-shadow:0 0 0 3px rgba(0,74,124,.1)}
 .internal-login-button{width:100%;margin-top:3px}
 @media(max-width:600px){.internal-login-wrap{min-height:calc(100vh - 138px);padding-block:30px}.internal-login-card{padding:28px 22px 24px}.internal-login-card h1{font-size:27px}.internal-login-top{padding-inline:18px}}
+
+
+@media print {
+  .acjl-top, .acjl-actions, .report-actions, .check-line, footer, .acjl-button { display: none !important; }
+  .acjl-page, .diagnostic-shell, .acjl-wrap, .acjl-form, .acjl-card { background: #fff !important; box-shadow: none !important; max-width: none !important; }
+  .acjl-card { border: 0 !important; padding: 0 !important; }
+  .review-grid { display: block !important; }
+  .review-grid > div { break-inside: avoid; margin-bottom: 18px; }
+  body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
