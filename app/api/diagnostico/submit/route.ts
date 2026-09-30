@@ -79,12 +79,20 @@ export async function POST(request: Request) {
     });
 
     const raw = await response.text();
+    const contentType = response.headers.get("content-type") || "";
+    const isHtmlResponse =
+      contentType.toLowerCase().includes("text/html") ||
+      /^\s*<!doctype\s+html/i.test(raw) ||
+      /^\s*<html[\s>]/i.test(raw);
+
     let result: { ok?: boolean; id?: string; error?: string; sheet?: string } = {};
 
-    try {
-      result = JSON.parse(raw);
-    } catch {
-      result = { error: raw || "Resposta inválida do Google Sheets." };
+    if (!isHtmlResponse) {
+      try {
+        result = JSON.parse(raw);
+      } catch {
+        result = { error: raw || "Resposta inválida do Google Sheets." };
+      }
     }
 
     // O Google Apps Script pode devolver uma página HTML intermédia mesmo
@@ -102,7 +110,7 @@ export async function POST(request: Request) {
       // o Apps Script pode ter concluído a gravação e devolvido HTML por causa
       // do redireccionamento do ContentService. Mantemos o ID local para que
       // o utilizador não veja o conteúdo técnico do Google.
-      if (!Object.keys(result).length || result.error?.includes("<!DOCTYPE html>")) {
+      if (isHtmlResponse) {
         return NextResponse.json(
           {
             ok: true,
