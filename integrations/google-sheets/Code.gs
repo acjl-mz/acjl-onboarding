@@ -73,14 +73,29 @@ function doPost(e) {
     ensureHeaders_(sheet);
 
     const record = buildRecord_(data, id, now);
+    const existingRow = findSubmissionRow_(sheet, id);
+    if (existingRow) {
+      return json_({ ok: true, id: id, sheet: sheet.getName(), duplicate: true });
+    }
+
     appendRecord_(sheet, record);
 
-    sendCopy_(data, id, now, sheet.getName());
+    let emailSent = true;
+    let emailError = "";
+    try {
+      sendCopy_(data, id, now, sheet.getName());
+    } catch (mailError) {
+      emailSent = false;
+      emailError = mailError instanceof Error ? mailError.message : String(mailError);
+      console.warn("Diagnóstico guardado, mas a notificação por e-mail falhou: " + emailError);
+    }
 
     return json_({
       ok: true,
       id: id,
-      sheet: sheet.getName()
+      sheet: sheet.getName(),
+      emailSent: emailSent,
+      emailError: emailError
     });
   } catch (error) {
     return json_({
@@ -222,6 +237,15 @@ function buildRecord_(data, id, now) {
     "Avaliação técnica do consultor": jsonText_(b.assessment || {}),
     "Dados completos (JSON)": JSON.stringify(data)
   };
+}
+
+function findSubmissionRow_(sheet, id) {
+  const idColumn = 1;
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return 0;
+  const values = sheet.getRange(2, idColumn, lastRow - 1, 1).getDisplayValues().flat();
+  const index = values.indexOf(String(id));
+  return index >= 0 ? index + 2 : 0;
 }
 
 function appendRecord_(sheet, record) {
