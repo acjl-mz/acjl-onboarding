@@ -23,6 +23,7 @@ const locked = [
 export default function NecessidadesPage() {
   const [d, setD] = useState(readDiagnostic());
   const [error, setError] = useState("");
+  const isBriefing = d.diagnosticType === "BRIEFING_ACJL";
 
   const setModel = (model: "AVENCA" | "PONTUAL") => {
     setD((x) => ({
@@ -109,7 +110,7 @@ export default function NecessidadesPage() {
 
   return (
     <main className="acjl-page">
-      <SiteHeader step="3 DE 6 · MODELO E NECESSIDADES" />
+      <SiteHeader step={isBriefing ? "3 DE 7 · NECESSIDADES E DIMENSIONAMENTO" : "3 DE 6 · MODELO E NECESSIDADES"} />
 
       <div className="acjl-wrap diagnostic-shell">
         <div className="acjl-form">
@@ -120,11 +121,8 @@ export default function NecessidadesPage() {
           <section className="acjl-card diagnostic-card">
             <div className="acjl-eyebrow">ETAPA 3 · MODELO DE APOIO</div>
 
-            <h1>Como pretende contar com a ACJL?</h1>
-            <p>
-              Escolha o modelo que melhor corresponde à necessidade da sua
-              empresa.
-            </p>
+            <h1>{isBriefing ? "O que precisa de ser tratado?" : "Como pretende contar com a ACJL?"}</h1>
+            <p>{isBriefing ? "No briefing, o consultor poderá aprofundar as necessidades, mesmo quando a empresa ainda não sabe exactamente qual serviço precisa." : "Escolha o modelo que melhor corresponde à necessidade da sua empresa."}</p>
 
             <div className="model-grid">
               <button
