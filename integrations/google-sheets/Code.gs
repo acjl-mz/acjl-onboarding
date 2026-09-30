@@ -293,20 +293,126 @@ function sendCopy_(data, id, submittedAt, sheetName) {
   const c = data.company || {};
   const b = data.consultantBriefing || {};
   const mode = data.diagnosticType === "BRIEFING_ACJL"
-    ? "Briefing ACJL"
+    ? "Briefing conduzido pela ACJL"
     : "Preenchimento pelo cliente";
 
   const subject = "Novo diagnóstico ACJL — " + (c.legalName || c.tradeName || "Empresa");
 
-  const body = [
-    "Foi recebido um novo diagnóstico no sistema ACJL.",
+  const html = buildDiagnosticEmailHtml_(data, id, submittedAt, sheetName, mode);
+  const plainText = buildDiagnosticEmailText_(data, id, submittedAt, sheetName, mode);
+
+  MailApp.sendEmail({
+    to: COPY_EMAIL,
+    subject: subject,
+    body: plainText,
+    htmlBody: html,
+    name: "ACJL — Diagnóstico"
+  });
+}
+
+function buildDiagnosticEmailHtml_(data, id, submittedAt, sheetName, mode) {
+  const r = data.responsible || {};
+  const c = data.company || {};
+  const b = data.consultantBriefing || {};
+
+  const companyName = c.legalName || c.tradeName || "Empresa";
+  const submitted = formatDate_(submittedAt);
+
+  let html = [
+    "<!doctype html>",
+    "<html><head><meta charset='UTF-8'></head>",
+    "<body style='margin:0;padding:24px;background:#f4f4f2;font-family:Arial,Helvetica,sans-serif;color:#222;'>",
+    "<div style='max-width:760px;margin:0 auto;background:#ffffff;border:1px solid #e4e1dc;border-radius:12px;overflow:hidden;'>",
+    "<div style='padding:24px 28px;background:#222;color:#fff;'>",
+    "<div style='font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#d7b56d;margin-bottom:8px;'>ACJL — Diagnóstico</div>",
+    "<div style='font-size:25px;font-weight:700;'>Novo diagnóstico recebido</div>",
+    "<div style='font-size:14px;color:#ddd;margin-top:8px;'>" + esc_(mode) + "</div>",
+    "</div>",
+    "<div style='padding:24px 28px;'>",
+    infoGrid_([
+      ["Empresa", companyName],
+      ["ID do diagnóstico", id],
+      ["Recebido em", submitted],
+      ["Folha", sheetName]
+    ]),
+    sectionHtml_("Responsável pela submissão", [
+      ["Nome", r.fullName],
+      ["Relação com a empresa", r.role],
+      ["Telefone", r.phone],
+      ["E-mail", r.email],
+      ["Canal preferencial", r.preferredChannel]
+    ]),
+    sectionHtml_("Empresa", [
+      ["Razão social", c.legalName],
+      ["Nome comercial", c.tradeName],
+      ["NUIT", c.nuit],
+      ["Tipo de entidade", c.organizationType],
+      ["Sector", c.sector],
+      ["Actividade principal", c.mainActivity],
+      ["Descrição da actividade", c.activityDescription],
+      ["Ano de constituição", c.incorporationYear],
+      ["Ano de início da actividade", c.activityStartYear],
+      ["Localização", c.location],
+      ["Estabelecimentos", c.establishments],
+      ["N.º de colaboradores", c.employeeRange],
+      ["Volume de actividade", c.activityVolume]
+    ]),
+    sectionHtml_("Modelo e serviços", [
+      ["Modelo", data.model],
+      ["Serviços", arrayText_(data.services)],
+      ["Detalhes das tarefas", data.taskDetails]
+    ]),
+    objectSectionHtml_("Tarefas seleccionadas", data.tasks),
+    objectSectionHtml_("Dimensionamento dos serviços", data.serviceDetails),
+    objectSectionHtml_("Organização interna", data.operations),
+    objectSectionHtml_("Situação actual", data.situation),
+    objectSectionHtml_("Objectivos", data.objectives)
+  ].join("");
+
+  if (data.diagnosticType === "BRIEFING_ACJL") {
+    html += sectionHtml_("Briefing ACJL", [
+      ["Consultor", b.consultantName],
+      ["Data do briefing", b.briefingDate],
+      ["Duração", b.duration],
+      ["Sistemas e ferramentas", b.systemsTools],
+      ["Fluxo documental / informação", b.documentInformationFlow],
+      ["Controlos internos", b.internalControls],
+      ["Sazonalidade", b.seasonality],
+      ["Dependências", b.dependencies],
+      ["Riscos / pontos de atenção", b.risksAttention],
+      ["Nota técnica", b.technicalNote],
+      ["Notas", b.notes]
+    ]);
+    html += objectSectionHtml_("Avaliação técnica do consultor", b.assessment);
+  }
+
+  html += [
+    "<div style='margin-top:28px;padding:16px;background:#f7f6f3;border-radius:8px;font-size:12px;color:#666;'>",
+    "<strong>Registo interno ACJL</strong><br>",
+    "Todas as respostas foram guardadas no Google Sheets, incluindo os dados completos para consulta interna. ",
+    "Este e-mail é um resumo operacional da submissão e não substitui a análise técnica.",
+    "</div>",
+    "</div>",
+    "</div>",
+    "</body></html>"
+  ].join("");
+
+  return html;
+}
+
+function buildDiagnosticEmailText_(data, id, submittedAt, sheetName, mode) {
+  const r = data.responsible || {};
+  const c = data.company || {};
+  const b = data.consultantBriefing || {};
+
+  return [
+    "ACJL — NOVO DIAGNÓSTICO RECEBIDO",
     "",
-    "ORIGEM: " + mode,
+    "Origem: " + mode,
+    "Empresa: " + (c.legalName || c.tradeName || ""),
     "ID: " + id,
-    "DATA/HORA DE SUBMISSÃO: " + submittedAt,
-    "FOLHA: " + sheetName,
-    b.consultantName ? "CONSULTOR: " + b.consultantName : "",
-    b.briefingDate ? "DATA DO BRIEFING: " + b.briefingDate : "",
+    "Recebido em: " + formatDate_(submittedAt),
+    "Folha: " + sheetName,
     "",
     "RESPONSÁVEL",
     "Nome: " + (r.fullName || ""),
@@ -322,17 +428,160 @@ function sendCopy_(data, id, submittedAt, sheetName) {
     "Actividade: " + (c.mainActivity || ""),
     "Localização: " + (c.location || ""),
     "",
-    "MODELO: " + (data.model || ""),
-    "SERVIÇOS: " + arrayText_(data.services),
+    "MODELO E SERVIÇOS",
+    "Modelo: " + (data.model || ""),
+    "Serviços: " + arrayText_(data.services),
+    "Tarefas: " + objectText_(data.tasks),
+    "Detalhes das tarefas: " + (data.taskDetails || ""),
     "",
-    "O registo foi guardado com todas as respostas na folha indicada, incluindo a coluna 'Dados completos (JSON)'."
+    data.diagnosticType === "BRIEFING_ACJL"
+      ? "BRIEFING ACJL\nConsultor: " + (b.consultantName || "") + "\nNotas: " + (b.notes || "")
+      : "",
+    "",
+    "As respostas completas permanecem guardadas no Google Sheets."
   ].filter(Boolean).join("\n");
+}
 
-  MailApp.sendEmail({
-    to: COPY_EMAIL,
-    subject: subject,
-    body: body
-  });
+function sectionHtml_(title, fields) {
+  const rows = fields
+    .filter(item => hasValue_(item[1]))
+    .map(item =>
+      "<tr>" +
+      "<td style='padding:9px 12px;border-bottom:1px solid #eee;color:#666;width:35%;vertical-align:top;'>" + esc_(item[0]) + "</td>" +
+      "<td style='padding:9px 12px;border-bottom:1px solid #eee;color:#222;vertical-align:top;'>" + nl2br_(item[1]) + "</td>" +
+      "</tr>"
+    ).join("");
+
+  if (!rows) return "";
+
+  return [
+    "<div style='margin-top:28px;'>",
+    "<div style='font-size:16px;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #d7b56d;'>",
+    esc_(title),
+    "</div>",
+    "<table style='width:100%;border-collapse:collapse;font-size:13px;'>",
+    rows,
+    "</table>",
+    "</div>"
+  ].join("");
+}
+
+function objectSectionHtml_(title, value) {
+  if (!hasValue_(value)) return "";
+
+  const rows = objectRows_(value);
+  if (!rows.length) return "";
+
+  return [
+    "<div style='margin-top:28px;'>",
+    "<div style='font-size:16px;font-weight:700;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #d7b56d;'>",
+    esc_(title),
+    "</div>",
+    "<table style='width:100%;border-collapse:collapse;font-size:13px;'>",
+    rows.map(item =>
+      "<tr>" +
+      "<td style='padding:9px 12px;border-bottom:1px solid #eee;color:#666;width:35%;vertical-align:top;'>" + esc_(humanizeKey_(item[0])) + "</td>" +
+      "<td style='padding:9px 12px;border-bottom:1px solid #eee;color:#222;vertical-align:top;'>" + nl2br_(item[1]) + "</td>" +
+      "</tr>"
+    ).join(""),
+    "</table>",
+    "</div>"
+  ].join("");
+}
+
+function infoGrid_(fields) {
+  return [
+    "<table style='width:100%;border-collapse:separate;border-spacing:8px;margin:0 -8px 4px;'>",
+    fields.map(item =>
+      "<tr><td style='padding:8px;background:#f7f6f3;border-radius:6px;width:25%;font-size:11px;color:#777;text-transform:uppercase;letter-spacing:.4px;'>" +
+      esc_(item[0]) +
+      "</td><td style='padding:8px;background:#f7f6f3;border-radius:6px;font-size:13px;font-weight:600;'>" +
+      esc_(item[1]) +
+      "</td></tr>"
+    ).join(""),
+    "</table>"
+  ].join("");
+}
+
+function objectRows_(value, prefix) {
+  const rows = [];
+  const currentPrefix = prefix || "";
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => {
+      const key = currentPrefix ? currentPrefix + " · " + (index + 1) : String(index + 1);
+      if (item && typeof item === "object") {
+        rows.push.apply(rows, objectRows_(item, key));
+      } else if (hasValue_(item)) {
+        rows.push([key, String(item)]);
+      }
+    });
+    return rows;
+  }
+
+  if (value && typeof value === "object") {
+    Object.keys(value).forEach(key => {
+      const label = currentPrefix ? currentPrefix + " · " + key : key;
+      const item = value[key];
+
+      if (item && typeof item === "object") {
+        const nested = objectRows_(item, label);
+        if (nested.length) rows.push.apply(rows, nested);
+      } else if (hasValue_(item)) {
+        rows.push([label, String(item)]);
+      }
+    });
+    return rows;
+  }
+
+  if (hasValue_(value)) rows.push([currentPrefix || "Resposta", String(value)]);
+  return rows;
+}
+
+function objectText_(value) {
+  return objectRows_(value).map(item => item[0] + ": " + item[1]).join(" | ");
+}
+
+function humanizeKey_(key) {
+  return String(key || "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^./, s => s.toUpperCase());
+}
+
+function arrayText_(value) {
+  return Array.isArray(value) ? value.map(item => String(item)).join(" · ") : "";
+}
+
+function hasValue_(value) {
+  return value !== null &&
+    value !== undefined &&
+    !(typeof value === "string" && value.trim() === "") &&
+    !(Array.isArray(value) && value.length === 0);
+}
+
+function esc_(value) {
+  return String(value === null || value === undefined ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function nl2br_(value) {
+  return esc_(value).replace(/\r?\n/g, "<br>");
+}
+
+function formatDate_(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (isNaN(date.getTime())) return String(value || "");
+  return Utilities.formatDate(
+    date,
+    Session.getScriptTimeZone() || "Africa/Maputo",
+    "dd/MM/yyyy HH:mm"
+  );
 }
 
 function json_(value) {
