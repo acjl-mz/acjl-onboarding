@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { responsible, company, model, services, tasks, taskDetails, serviceDetails, operations, situation, objectives } = body ?? {};
+    const { responsible, company, model } = body ?? {};
 
     if (!responsible || !company || !model || !["AVENCA", "PONTUAL"].includes(model)) {
       return NextResponse.json({ error: "Dados obrigatórios em falta." }, { status: 400 });
@@ -19,18 +19,7 @@ export async function POST(request: Request) {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        responsible,
-        company,
-        model,
-        services: Array.isArray(services) ? services : [],
-        tasks: tasks && typeof tasks === "object" ? tasks : {},
-        taskDetails: String(taskDetails || ""),
-        serviceDetails: serviceDetails && typeof serviceDetails === "object" ? serviceDetails : {},
-        operations: operations && typeof operations === "object" ? operations : {},
-        situation: situation && typeof situation === "object" ? situation : {},
-        objectives: objectives && typeof objectives === "object" ? objectives : {},
-      }),
+      body: JSON.stringify(body),
     });
 
     const result = await response.json().catch(() => ({}));
