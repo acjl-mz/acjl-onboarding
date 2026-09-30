@@ -1,3 +1,283 @@
 "use client";
-import Link from "next/link";import{useEffect,useState}from"react";import{SiteHeader,SiteFooter}from"@/components/SiteChrome";import{readDiagnostic,DiagnosticData}from"@/lib/diagnostic";
-export default function RevisaoPage(){const[d,setD]=useState<DiagnosticData|null>(null);const[confirmed,setConfirmed]=useState(false);const[error,setError]=useState("");const[submitting,setSubmitting]=useState(false);useEffect(()=>{setD(readDiagnostic());if(window.location.search.includes("print=1"))setTimeout(()=>window.print(),350)},[]);if(!d)return null;const submit=async()=>{if(!confirmed||submitting)return;setSubmitting(true);setError("");try{const r=await fetch("/api/diagnostico/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});const result=await r.json();if(!r.ok)throw new Error(result.error||"Não foi possível enviar o diagnóstico.");localStorage.removeItem("acjl-diagnostic");window.location.href="/diagnostico/sucesso"}catch(e){setError(e instanceof Error?e.message:"Não foi possível enviar o diagnóstico.");setSubmitting(false)}};const serviceDetails=d.serviceDetails||{};const briefing=d.consultantBriefing||{};const tasks=Object.entries(d.tasks||{}).flatMap(([s,ts])=>(Array.isArray(ts)?ts:[]).map(t=>s+": "+t));return <main className="acjl-page"><SiteHeader step="6 DE 6 · CONFIRMAÇÃO"/><div className="acjl-wrap diagnostic-shell"><div className="acjl-form"><div className="acjl-progress"><span style={{width:"100%"}}/></div><section className="acjl-card diagnostic-card"><div className="acjl-eyebrow">ETAPA 7 · CONFIRMAÇÃO</div><h1>Confirme as informações.</h1><p>Reveja os dados antes de enviar. Estas informações serão usadas para dimensionar o apoio e preparar a solução.</p><div className="review-grid"><div><strong>Responsável</strong><span>{d.responsible.fullName||"—"} · {d.responsible.role||"—"}<br/>{d.responsible.phone||"—"} · {d.responsible.email||"—"}</span></div><div><strong>Empresa</strong><span>{d.company.legalName||"—"}<br/>NUIT: {d.company.nuit||"—"} · {d.company.organizationType||"—"}<br/>{d.company.sector||"—"} · {d.company.mainActivity||"—"}<br/>{d.company.location||"—"} · {d.company.employeeRange||"—"} colaboradores</span></div><div><strong>Modelo</strong><span>{d.model==="AVENCA"?"Avença mensal":d.model==="PONTUAL"?"Serviço pontual":d.model==="RECOMENDACAO"?"Ainda não sei · Recomende-me":"—"}</span></div><div><strong>Áreas de apoio</strong><span>{d.services.length?d.services.join(", "):d.model==="RECOMENDACAO"?"A definir com recomendação ACJL":"—"}</span></div>{d.model==="PONTUAL"&&<div><strong>Tarefas</strong><span>{tasks.length?tasks.join(" · "):"Nenhuma seleccionada"}{d.taskDetails&&<><br/><br/>{d.taskDetails}</>}</span></div>}{d.services.length>0&&<div><strong>Dimensionamento inicial</strong><span>{d.services.map(s=>{const x=serviceDetails[s];return <span key={s} style={{display:"block",marginBottom:8}}><strong>{s}</strong>{x&&<><br/>Estado: {x.currentState||"—"} · Frequência: {x.frequency||"—"} · Volume: {x.volume||"—"} · Urgência: {x.urgency||"—"}{x.notes&&<><br/>Nota: {x.notes}</>}</>}</span>})}</span></div>}{d.diagnosticType==="BRIEFING_ACJL"&&<div><strong>Briefing ACJL</strong><span>Consultor: {briefing.consultantName||"—"}<br/>Data: {briefing.briefingDate||"—"} · Duração: {briefing.duration||"—"}<br/>Sistemas: {briefing.assessment?.systems||"—"}<br/>Fluxo de informação: {briefing.assessment?.documentFlow||"—"}<br/>Controlos: {briefing.assessment?.internalControls||"—"}<br/>Sazonalidade: {briefing.assessment?.seasonality||"—"}<br/>Dependências: {briefing.assessment?.dependencies||"—"}<br/>Pontos de atenção: {briefing.assessment?.risks||"—"}<br/>{briefing.notes||""}</span></div><div><strong>Organização interna</strong><span>Rotinas: {d.operations.routines||"—"} · Processos: {d.operations.processes||"—"}<br/>Colecta: {d.operations.collection||"—"} · Tratamento: {d.operations.treatment||"—"}<br/>Gestão: {d.operations.management||"—"}</span></div><div><strong>Situação actual e objectivos</strong><span>Prestador: {d.situation.provider||"—"}<br/>{d.situation.motivation||"—"}<br/><br/>Objectivo: {d.objectives.main||"—"}</span></div></div><div className="report-actions"><Link href="/diagnostico/revisao?print=1" className="acjl-button acjl-secondary" target="_blank">Abrir relatório para impressão / PDF</Link></div><label className="check-line"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/> Confirmo que as informações fornecidas são verdadeiras de acordo com o meu conhecimento.</label>{error&&<div className="form-error" role="alert">⚠ {error}</div>}<div className="acjl-actions"><Link href="/diagnostico/objectivos" className="acjl-button acjl-secondary">← Voltar</Link><button type="button" disabled={!confirmed||submitting} onClick={submit} className="acjl-button acjl-primary">{submitting?"A enviar…":"Enviar diagnóstico"}</button></div></section></div></div><SiteFooter/></main>}
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
+import { readDiagnostic, DiagnosticData } from "@/lib/diagnostic";
+
+export default function RevisaoPage() {
+  const [d, setD] = useState<DiagnosticData | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setD(readDiagnostic());
+    if (window.location.search.includes("print=1")) {
+      setTimeout(() => window.print(), 350);
+    }
+  }, []);
+
+  if (!d) return null;
+
+  const submit = async () => {
+    if (!confirmed || submitting) return;
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/diagnostico/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(d),
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Não foi possível enviar o diagnóstico.");
+      }
+
+      localStorage.removeItem("acjl-diagnostic");
+      window.location.href = "/diagnostico/sucesso";
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Não foi possível enviar o diagnóstico.",
+      );
+      setSubmitting(false);
+    }
+  };
+
+  const serviceDetails = d.serviceDetails || {};
+  const briefing = d.consultantBriefing || {};
+  const tasks = Object.entries(d.tasks || {}).flatMap(([service, serviceTasks]) =>
+    (Array.isArray(serviceTasks) ? serviceTasks : []).map(
+      (task) => service + ": " + task,
+    ),
+  );
+
+  const modelLabel =
+    d.model === "AVENCA"
+      ? "Avença mensal"
+      : d.model === "PONTUAL"
+        ? "Serviço pontual"
+        : d.model === "RECOMENDACAO"
+          ? "Ainda não sei · Recomende-me"
+          : "—";
+
+  return (
+    <main className="acjl-page">
+      <SiteHeader step="6 DE 6 · CONFIRMAÇÃO" />
+
+      <div className="acjl-wrap diagnostic-shell">
+        <div className="acjl-form">
+          <div className="acjl-progress">
+            <span style={{ width: "100%" }} />
+          </div>
+
+          <section className="acjl-card diagnostic-card">
+            <div className="acjl-eyebrow">ETAPA 7 · CONFIRMAÇÃO</div>
+            <h1>Confirme as informações.</h1>
+            <p>
+              Reveja os dados antes de enviar. Estas informações serão usadas
+              para dimensionar o apoio e preparar a solução.
+            </p>
+
+            <div className="review-grid">
+              <div>
+                <strong>Responsável</strong>
+                <span>
+                  {d.responsible.fullName || "—"} · {d.responsible.role || "—"}
+                  <br />
+                  {d.responsible.phone || "—"} · {d.responsible.email || "—"}
+                </span>
+              </div>
+
+              <div>
+                <strong>Empresa</strong>
+                <span>
+                  {d.company.legalName || "—"}
+                  <br />
+                  NUIT: {d.company.nuit || "—"} ·{" "}
+                  {d.company.organizationType || "—"}
+                  <br />
+                  {d.company.sector || "—"} · {d.company.mainActivity || "—"}
+                  <br />
+                  {d.company.location || "—"} ·{" "}
+                  {d.company.employeeRange || "—"} colaboradores
+                </span>
+              </div>
+
+              <div>
+                <strong>Modelo</strong>
+                <span>{modelLabel}</span>
+              </div>
+
+              <div>
+                <strong>Áreas de apoio</strong>
+                <span>
+                  {d.services.length
+                    ? d.services.join(", ")
+                    : d.model === "RECOMENDACAO"
+                      ? "A definir com recomendação ACJL"
+                      : "—"}
+                </span>
+              </div>
+
+              {d.model === "PONTUAL" && (
+                <div>
+                  <strong>Tarefas</strong>
+                  <span>
+                    {tasks.length ? tasks.join(" · ") : "Nenhuma seleccionada"}
+                    {d.taskDetails && (
+                      <>
+                        <br />
+                        <br />
+                        {d.taskDetails}
+                      </>
+                    )}
+                  </span>
+                </div>
+              )}
+
+              {d.services.length > 0 && (
+                <div>
+                  <strong>Dimensionamento inicial</strong>
+                  <span>
+                    {d.services.map((service) => {
+                      const details = serviceDetails[service];
+                      return (
+                        <span
+                          key={service}
+                          style={{ display: "block", marginBottom: 8 }}
+                        >
+                          <strong>{service}</strong>
+                          {details && (
+                            <>
+                              <br />
+                              Estado: {details.currentState || "—"} ·
+                              Frequência: {details.frequency || "—"} · Volume:{" "}
+                              {details.volume || "—"} · Urgência:{" "}
+                              {details.urgency || "—"}
+                              {details.notes && (
+                                <>
+                                  <br />
+                                  Nota: {details.notes}
+                                </>
+                              )}
+                            </>
+                          )}
+                        </span>
+                      );
+                    })}
+                  </span>
+                </div>
+              )}
+
+              {d.diagnosticType === "BRIEFING_ACJL" && (
+                <div>
+                  <strong>Briefing ACJL</strong>
+                  <span>
+                    Consultor: {briefing.consultantName || "—"}
+                    <br />
+                    Data: {briefing.briefingDate || "—"} · Duração:{" "}
+                    {briefing.duration || "—"}
+                    <br />
+                    Sistemas: {briefing.assessment?.systems || "—"}
+                    <br />
+                    Fluxo de informação:{" "}
+                    {briefing.assessment?.documentFlow || "—"}
+                    <br />
+                    Controlos: {briefing.assessment?.internalControls || "—"}
+                    <br />
+                    Sazonalidade: {briefing.assessment?.seasonality || "—"}
+                    <br />
+                    Dependências: {briefing.assessment?.dependencies || "—"}
+                    <br />
+                    Pontos de atenção: {briefing.assessment?.risks || "—"}
+                    <br />
+                    {briefing.notes || ""}
+                  </span>
+                </div>
+              )}
+
+              <div>
+                <strong>Organização interna</strong>
+                <span>
+                  Rotinas: {d.operations.routines || "—"} · Processos:{" "}
+                  {d.operations.processes || "—"}
+                  <br />
+                  Colecta: {d.operations.collection || "—"} · Tratamento:{" "}
+                  {d.operations.treatment || "—"}
+                  <br />
+                  Gestão: {d.operations.management || "—"}
+                </span>
+              </div>
+
+              <div>
+                <strong>Situação actual e objectivos</strong>
+                <span>
+                  Prestador: {d.situation.provider || "—"}
+                  <br />
+                  {d.situation.motivation || "—"}
+                  <br />
+                  <br />
+                  Pendências: {d.situation.pending || "—"}
+                  <br />
+                  <br />
+                  Objectivo: {d.objectives.main || "—"}
+                </span>
+              </div>
+            </div>
+
+            <div className="report-actions">
+              <Link
+                href="/diagnostico/revisao?print=1"
+                className="acjl-button acjl-secondary"
+                target="_blank"
+              >
+                Abrir relatório para impressão / PDF
+              </Link>
+            </div>
+
+            <label className="check-line">
+              <input
+                type="checkbox"
+                checked={confirmed}
+                onChange={(e) => setConfirmed(e.target.checked)}
+              />
+              Confirmo que as informações fornecidas são verdadeiras de acordo
+              com o meu conhecimento.
+            </label>
+
+            {error && (
+              <div className="form-error" role="alert">
+                ⚠ {error}
+              </div>
+            )}
+
+            <div className="acjl-actions">
+              <Link
+                href="/diagnostico/objectivos"
+                className="acjl-button acjl-secondary"
+              >
+                ← Voltar
+              </Link>
+              <button
+                type="button"
+                disabled={!confirmed || submitting}
+                onClick={submit}
+                className="acjl-button acjl-primary"
+              >
+                {submitting ? "A enviar…" : "Enviar diagnóstico"}
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <SiteFooter />
+    </main>
+  );
+}
