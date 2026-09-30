@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       try {
         result = JSON.parse(raw);
       } catch {
-        result = { error: raw || "Resposta inválida do Google Sheets." };
+        result = { error: "Resposta inválida do serviço de armazenamento." };
       }
     }
 
@@ -151,13 +151,9 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (error) {
+    console.error("Falha ao processar submissão do diagnóstico:", error);
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Não foi possível processar o pedido.",
-      },
+      { error: "Não foi possível processar o pedido." },
       { status: 500 },
     );
   }
