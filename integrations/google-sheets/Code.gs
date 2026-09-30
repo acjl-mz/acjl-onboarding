@@ -543,10 +543,46 @@ function objectText_(value) {
 }
 
 function humanizeKey_(key) {
-  return String(key || "")
+  const labels = {
+    // Organização interna
+    routines: "Rotinas definidas",
+    processes: "Processos e procedimentos",
+    collection: "Recolha e organização da informação",
+    treatment: "Tratamento e transformação da informação",
+    management: "Acompanhamento, controlo e gestão da informação",
+
+    // Situação actual
+    provider: "Prestador actual",
+    providerScope: "O que pretende manter, melhorar ou alterar",
+    motivation: "Motivação para procurar apoio",
+    pending: "Assuntos pendentes",
+
+    // Objectivos
+    main: "Principal resultado pretendido",
+    recommendation: "Recomendação da ACJL sobre o modelo de contratação",
+
+    // Briefing ACJL
+    consultantName: "Consultor ACJL",
+    briefingDate: "Data do briefing",
+    duration: "Duração do briefing",
+    systems: "Sistemas e ferramentas utilizados",
+    documentFlow: "Fluxo de documentos e informação",
+    internalControls: "Controlos internos observados",
+    dependencies: "Dependências",
+    seasonality: "Sazonalidade ou períodos críticos",
+    risks: "Pontos de atenção identificados",
+    assessment: "Observação técnica do consultor"
+  };
+
+  const raw = String(key || "");
+  if (Object.prototype.hasOwnProperty.call(labels, raw)) {
+    return labels[raw];
+  }
+
+  return raw
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/[_-]+/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(/\\s+/g, " ")
     .replace(/^./, s => s.toUpperCase());
 }
 
