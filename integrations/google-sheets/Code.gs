@@ -1,9 +1,11 @@
 const SHEETS = {
-  CLIENT: "Diagnósticos",
-  CONSULTANT: "Briefings ACJL",
+  CLIENT: "ACJL - Diagnosticos",
+  CONSULTANT: "ACJL - Briefing",
 };
 
 const COPY_EMAIL = "acjl.corporate@gmail.com";
+
+const SPREADSHEET_ID_PROPERTY = "SPREADSHEET_ID";
 
 const HEADERS = [
   "ID da submissão",
@@ -92,6 +94,26 @@ function doPost(e) {
   }
 }
 
+function getSpreadsheet_() {
+  const id = PropertiesService.getScriptProperties().getProperty(SPREADSHEET_ID_PROPERTY);
+
+  if (!id) {
+    throw new Error(
+      "SPREADSHEET_ID não configurado no Apps Script. " +
+      "Abra Project Settings > Script properties e defina SPREADSHEET_ID."
+    );
+  }
+
+  try {
+    return SpreadsheetApp.openById(id.trim());
+  } catch (_) {
+    throw new Error(
+      "Não foi possível abrir o Google Sheets configurado. " +
+      "Verifique o SPREADSHEET_ID e as permissões do Web App."
+    );
+  }
+}
+
 function parsePayload_(e) {
   if (!e || !e.postData || !e.postData.contents) {
     throw new Error("Payload vazio.");
@@ -123,7 +145,7 @@ function validatePayload_(data) {
 }
 
 function getSheetForType_(diagnosticType) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet_();
   const name = diagnosticType === "BRIEFING_ACJL"
     ? SHEETS.CONSULTANT
     : SHEETS.CLIENT;
@@ -218,6 +240,7 @@ function appendRecord_(sheet, record) {
     "ID da submissão",
     "NUIT",
     "Telefone",
+    "E-mail",
     "Dados completos (JSON)"
   ];
 
